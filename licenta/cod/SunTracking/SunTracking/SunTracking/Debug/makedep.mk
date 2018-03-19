@@ -8,6 +8,8 @@ graphics.c
 
 hx1230.c
 
+joystick_driver.c
+
 light.c
 
 main.c
@@ -19,4 +21,6 @@ sg90_driver.c
 state_handler.c
 
 tracking.c
+
+user_interface.c
 

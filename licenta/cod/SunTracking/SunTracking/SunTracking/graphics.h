@@ -13,5 +13,7 @@ void display_title(void);
 void display_data_menu(void);
 void display_light_sensor_data(unsigned char sensor, int data);
 void display_idle_state_message(void);
+void display_manual_state_message(void);
+void display_joystick_data(unsigned int x, unsigned int y);
 
 #endif /* GRAPHICS_H_ */

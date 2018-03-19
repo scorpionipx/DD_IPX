@@ -40,12 +40,14 @@ C_SRCS +=  \
 ../adc_driver.c \
 ../graphics.c \
 ../hx1230.c \
+../joystick_driver.c \
 ../light.c \
 ../main.c \
 ../pwm_driver.c \
 ../sg90_driver.c \
 ../state_handler.c \
-../tracking.c
+../tracking.c \
+../user_interface.c
 
 
 PREPROCESSING_SRCS += 
@@ -58,45 +60,53 @@ OBJS +=  \
 adc_driver.o \
 graphics.o \
 hx1230.o \
+joystick_driver.o \
 light.o \
 main.o \
 pwm_driver.o \
 sg90_driver.o \
 state_handler.o \
-tracking.o
+tracking.o \
+user_interface.o
 
 OBJS_AS_ARGS +=  \
 adc_driver.o \
 graphics.o \
 hx1230.o \
+joystick_driver.o \
 light.o \
 main.o \
 pwm_driver.o \
 sg90_driver.o \
 state_handler.o \
-tracking.o
+tracking.o \
+user_interface.o
 
 C_DEPS +=  \
 adc_driver.d \
 graphics.d \
 hx1230.d \
+joystick_driver.d \
 light.d \
 main.d \
 pwm_driver.d \
 sg90_driver.d \
 state_handler.d \
-tracking.d
+tracking.d \
+user_interface.d
 
 C_DEPS_AS_ARGS +=  \
 adc_driver.d \
 graphics.d \
 hx1230.d \
+joystick_driver.d \
 light.d \
 main.d \
 pwm_driver.d \
 sg90_driver.d \
 state_handler.d \
-tracking.d
+tracking.d \
+user_interface.d
 
 OUTPUT_FILE_PATH +=SunTracking.elf
 
@@ -112,6 +122,10 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
+
+
 
 
 

@@ -144,6 +144,12 @@
     <Compile Include="hx_8x6_characters.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="joystick_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="joystick_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="light.c">
       <SubType>compile</SubType>
     </Compile>
@@ -175,6 +181,12 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="tracking.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="user_interface.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="user_interface.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>

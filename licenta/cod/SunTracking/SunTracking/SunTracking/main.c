@@ -2,6 +2,7 @@
 #include "global.h"
 #include <avr/io.h>
 #include <util/delay.h>
+#include <avr/interrupt.h>
 #include "adc_driver.h"
 #include "hx1230.h"
 #include "hx_8x6_characters.h"
@@ -10,12 +11,16 @@
 #include "pwm_driver.h"
 #include "sg90_driver.h"
 #include "tracking.h"
+#include "user_interface.h"
+#include "state_handler.h"
+#include "joystick_driver.h"
 
 void uC_init(void);
 
 int main(void)
 {
 	STATE = STATE_INIT;
+	OLD_STATE = STATE_INIT;
 	uC_init();
 	
 	SG90_INCLINE_DUTY_CYCLE_REGISTER = SG90_INCLINE_POS_0;
@@ -27,24 +32,28 @@ int main(void)
 	
     while (1) 
     {
-		switch(STATE)
+	    if(STATE_CHANGED)
+	    {
+		    OLD_STATE = STATE; // update state
+		    go_to_state(STATE);
+		    _delay_ms(250);
+		    sei(); // enable interrupts
+	    }
+		
+		switch(OLD_STATE)
 		{
-			case STATE_IDLE:
-			{
-				break;
-			}
-			case STATE_MANUAL:
-			{
-				break;
-			}
 			case STATE_TRACKING:
 			{
 				track();
 				break;
 			}
+			case STATE_MANUAL:
+			{
+				manual_control();
+				break;
+			}
 			default:
 			{
-				STATE = STATE_MANUAL;
 				break;
 			}
 		}
@@ -63,6 +72,9 @@ void uC_init(void)
 	init_pwm_channels();
 	_delay_ms(50);
 	
+	init_user_interface();
+	_delay_ms(50);
+	
 	init_hx1230_control();
 	_delay_ms(50);
 	hx_fill_screen();
@@ -71,5 +83,7 @@ void uC_init(void)
 	_delay_ms(50);
 	
 	display_title();
-	display_idle_state_message();
-	}
+	display_idle_state_message(); 
+	
+	sei(); // enable global interrupts
+}

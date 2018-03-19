@@ -64,7 +64,7 @@ void track(void)
 	hx_write_char('0' + (left_intensity_average / 10) % 10);
 	hx_write_char('0' + left_intensity_average % 10);
 	
-	hx_set_coordinates(66, 4);
+	hx_set_coordinates(78, 4);
 	hx_write_char('0' + (right_intensity_average / 10) % 10);
 	hx_write_char('0' + right_intensity_average % 10);
 	
