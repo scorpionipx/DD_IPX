@@ -12,4 +12,11 @@
 #define F_CPU 1000000UL
 
 
+unsigned char STATE;
+#define STATE_INIT 0
+#define STATE_IDLE 1
+#define STATE_MANUAL 2
+#define STATE_TRACKING 3
+
+
 #endif /* GLOBAL_H_ */

@@ -17,21 +17,6 @@ void display_title(void)
 
 void display_data_menu(void)
 {
-	/*
-	hx_set_coordinates(0, 3);
-	hx_write_string("Light UL: n/a%");
-	hx_set_coordinates(0, 4);
-	hx_write_string("Light UR: n/a%");
-	hx_set_coordinates(0, 5);
-	hx_write_string("Light DL: n/a%");
-	hx_set_coordinates(0, 6);
-	hx_write_string("Light DR: n/a%");
-	hx_set_coordinates(0, 7);
-	hx_write_string("A: n/a");
-	hx_set_coordinates(HX_MAX_COL / 2, 7);
-	hx_write_string("B: n/a");
-	*/
-	
 	hx_set_coordinates(0, 3);
 	hx_write_string("       ||");
 	hx_set_coordinates(0, 4);
@@ -58,4 +43,14 @@ void display_light_sensor_data(uint8_t sensor, int data)
 	hx_write_char('0' + OCR1B / 100);
 	hx_write_char('0' + (OCR1B / 10) % 10);
 	hx_write_char('0' + OCR1B % 10);
+}
+
+void display_idle_state_message(void)
+{
+	hx_set_coordinates(0, 3);
+	hx_write_string("- system is in ");
+	hx_set_coordinates(0, 4);
+	hx_write_string("IDLE mode");
+	hx_set_coordinates(0, 6);
+	hx_write_string("going to sleep");
 }

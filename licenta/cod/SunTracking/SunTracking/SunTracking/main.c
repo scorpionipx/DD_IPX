@@ -15,19 +15,39 @@ void uC_init(void);
 
 int main(void)
 {
+	STATE = STATE_INIT;
 	uC_init();
 	
 	SG90_INCLINE_DUTY_CYCLE_REGISTER = SG90_INCLINE_POS_0;
 	SG90_ROTATE_DUTY_CYCLE_REGISTER = SG90_ROTATE_INIT_POS;
 	turn_on_pwm_channels();
 	
-	//test_sg90_rotate(1);
-	//_delay_ms(2000);
+	
+	STATE = STATE_IDLE;
 	
     while (1) 
     {
-		_delay_ms(50);
-		track();
+		switch(STATE)
+		{
+			case STATE_IDLE:
+			{
+				break;
+			}
+			case STATE_MANUAL:
+			{
+				break;
+			}
+			case STATE_TRACKING:
+			{
+				track();
+				break;
+			}
+			default:
+			{
+				STATE = STATE_MANUAL;
+				break;
+			}
+		}
     }
 }
 
@@ -51,7 +71,5 @@ void uC_init(void)
 	_delay_ms(50);
 	
 	display_title();
-	_delay_ms(1150);
-	display_data_menu();
-	_delay_ms(150);
-}
+	display_idle_state_message();
+	}

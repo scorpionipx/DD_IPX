@@ -11,6 +11,7 @@
 
 void display_title(void);
 void display_data_menu(void);
-void display_light_sensor_data(uint8_t sensor, int data);
+void display_light_sensor_data(unsigned char sensor, int data);
+void display_idle_state_message(void);
 
 #endif /* GRAPHICS_H_ */

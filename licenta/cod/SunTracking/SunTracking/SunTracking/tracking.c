@@ -5,8 +5,10 @@
  *  Author: ScorpionIPX
  */ 
 
+#include "global.h"
 #include <avr/io.h>
 #include <stdlib.h>
+#include <util/delay.h>
 #include "tracking.h"
 #include "light.h"
 #include "hx1230.h"
@@ -94,4 +96,5 @@ void track(void)
 	{
 		SG90_ROTATE_DUTY_CYCLE_REGISTER = SG90_ROTATE_POS_0;
 	}
+	_delay_ms(50);
 }

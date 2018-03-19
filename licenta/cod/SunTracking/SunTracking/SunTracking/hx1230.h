@@ -15,8 +15,8 @@
 #define HX1230_PORT PORTD //port used to control hx1230
 #define HX1230_DDR  DDRD //data direction register used for hx1230
 
-#define HX_RST PD3 //external reset input
-#define HX_CE  PD2 //chip enable
+#define HX_RST PD6 //external reset input
+#define HX_CE  PD5 //chip enable
 #define HX_DIN PD1 //serial data input
 #define HX_CLK PD0 //serial clock input
 
