@@ -9,6 +9,9 @@
 #ifndef ADC_DRIVER_H_
 #define ADC_DRIVER_H_
 
+#define ADC_MAX 1023
+#define ADC_HALF 512
+
 void ADC_init(void);
 uint16_t ADC_get_value(uint8_t ch);
 

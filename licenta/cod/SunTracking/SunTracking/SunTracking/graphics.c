@@ -6,6 +6,8 @@
  */ 
 
 #include "hx1230.h"
+#include "joystick_driver.h"
+#include <stdlib.h>
 
 void display_title(void)
 {
@@ -70,13 +72,16 @@ void display_manual_state_message(void)
 }
 
 void display_joystick_data(unsigned int x, unsigned int y)
-{
+{	 
 	hx_set_coordinates(24, 6);
+	
 	hx_write_char('0' + x / 1000);
 	hx_write_char('0' + (x / 100) % 10);
 	hx_write_char('0' + (x / 10) % 10);
 	hx_write_char('0' + x % 10);
+	
 	hx_set_coordinates(24, 7);
+	
 	hx_write_char('0' + y / 1000);
 	hx_write_char('0' + (y / 100) % 10);
 	hx_write_char('0' + (y / 10) % 10);

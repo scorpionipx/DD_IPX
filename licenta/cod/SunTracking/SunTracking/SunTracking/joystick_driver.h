@@ -9,8 +9,12 @@
 #ifndef JOYSTICK_DRIVER_H_
 #define JOYSTICK_DRIVER_H_
 
+#define JOYSTICK_RESOLUTION 10
+#define JOYSTICK_IDLE_VALUE 512
+#define JOYSTICK_DEAD_ZONE 100
 
 void manual_control(void);
+signed int format_axis(unsigned int axis);
 
 
 
