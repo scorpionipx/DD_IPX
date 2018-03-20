@@ -120,7 +120,73 @@
     </ToolchainSettings>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="adc_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="adc_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="global.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="graphics.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="graphics.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="hx1230.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="hx1230.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="hx_8x6_characters.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="joystick_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="joystick_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="light.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="light.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="main.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="pwm_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="pwm_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="sg90_driver.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="sg90_driver.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="state_handler.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="state_handler.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="tracking.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="tracking.h">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="user_interface.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="user_interface.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
