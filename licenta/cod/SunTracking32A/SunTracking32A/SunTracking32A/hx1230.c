@@ -19,12 +19,27 @@ void init_hx1230_control(void)
 	
 	// set idle state
 	CLEAR_HX_CLK;
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
 	CLEAR_HX_RST;
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
 	_delay_ms(50);
 	SET_HX_RST;
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
 	CLEAR_HX_CE;
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
 	_delay_ms(1);
 	SET_HX_CE;
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
 	_delay_ms(1);
 	
 	// commands needed to initialize hx1230 display
@@ -46,13 +61,25 @@ void hx_send_data(unsigned char _data)
 {
 	// activate hx1230
 	CLEAR_HX_CE;
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
 	
 	// configure communication for data transfer
 	SET_HX_DIN;
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
 	
 	// toggle clock
 	SET_HX_CLK;
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
 	CLEAR_HX_CLK;
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
 	
 	// send the actual data, MSB fiHX_RST
 	for(int bit_position = 7; bit_position >= 0; bit_position--)
@@ -61,15 +88,27 @@ void hx_send_data(unsigned char _data)
 		if(((_data >> bit_position) & 1) == 1)
 		{
 			SET_HX_DIN;
+			#ifdef HX_DELAY_ENABLED
+			_delay_us(HX_DELAY_US);
+			#endif
 		}
 		else
 		{
 			CLEAR_HX_DIN;
+			#ifdef HX_DELAY_ENABLED
+			_delay_us(HX_DELAY_US);
+			#endif
 		}
 		
 		// toggle clock
 		SET_HX_CLK;
+		#ifdef HX_DELAY_ENABLED
+		_delay_us(HX_DELAY_US);
+		#endif
 		CLEAR_HX_CLK;
+		#ifdef HX_DELAY_ENABLED
+		_delay_us(HX_DELAY_US);
+		#endif
 	}
 	
 	// deactivate hx1230
@@ -80,13 +119,22 @@ void hx_send_command(unsigned char _command)
 {
 	// activate hx1230
 	CLEAR_HX_CE;
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
 	
 	// configure communication for command transfer
 	CLEAR_HX_DIN;
 	
 	// toggle clock
 	SET_HX_CLK;
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
 	CLEAR_HX_CLK;
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
 	
 	// send the actual command, MSB fiHX_RST
 	for(int bit_position = 7; bit_position >= 0; bit_position--)
@@ -95,15 +143,27 @@ void hx_send_command(unsigned char _command)
 		if(((_command >> bit_position) & 1) == 1)
 		{
 			SET_HX_DIN;
+			#ifdef HX_DELAY_ENABLED
+			_delay_us(HX_DELAY_US);
+			#endif
 		}
 		else
 		{
 			CLEAR_HX_DIN;
+			#ifdef HX_DELAY_ENABLED
+			_delay_us(HX_DELAY_US);
+			#endif
 		}
 		
 		// toggle clock
 		SET_HX_CLK;
+		#ifdef HX_DELAY_ENABLED
+		_delay_us(HX_DELAY_US);
+		#endif
 		CLEAR_HX_CLK;
+		#ifdef HX_DELAY_ENABLED
+		_delay_us(HX_DELAY_US);
+		#endif
 	}
 	
 	// deactivate hx1230

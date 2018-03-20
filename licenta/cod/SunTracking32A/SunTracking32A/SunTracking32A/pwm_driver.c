@@ -10,8 +10,8 @@
 
 void init_pwm_channels(void)
 {
-	DDRB |= (1 << DDB1)|(1 << DDB2);
-	// PB1 and PB2 as output of 16bits Timer1
+	DDRD |= (1 << DDD4)|(1 << DDD5);
+	// PD4 and PD5 as output of 16bits Timer1
 	
 	 ICR1 = 2485;
 	 // set TOP to count 20ms

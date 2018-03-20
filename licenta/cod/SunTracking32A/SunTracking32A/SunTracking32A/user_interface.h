@@ -15,8 +15,8 @@
 #define BUTTON_1_PORT PORTD
 #define BUTTON_1_PIN 2 // PD2
 
-#define ADC_CHANNEL_X_AXIS 5
-#define ADC_CHANNEL_Y_AXIS 4
+#define ADC_CHANNEL_X_AXIS 4
+#define ADC_CHANNEL_Y_AXIS 5
 
 void init_next_state_button(void);
 void init_user_interface(void);

@@ -12,13 +12,19 @@
 #ifndef HX1230_H_
 #define HX1230_H_
 
-#define HX1230_PORT PORTD //port used to control hx1230
-#define HX1230_DDR  DDRD //data direction register used for hx1230
+//#define HX_DELAY_ENABLED // if uC is too fast, HX1230 won't be able to read commands
+#ifdef HX_DELAY_ENABLED
+	#define HX_DELAY_US 1
+#endif
 
-#define HX_RST PD6 //external reset input
-#define HX_CE  PD5 //chip enable
-#define HX_DIN PD1 //serial data input
-#define HX_CLK PD0 //serial clock input
+
+#define HX1230_PORT PORTC //port used to control hx1230
+#define HX1230_DDR  DDRC //data direction register used for hx1230
+
+#define HX_RST PC0 //external reset input
+#define HX_CE  PC1 //chip enable
+#define HX_DIN PC6 //serial data input
+#define HX_CLK PC7 //serial clock input
 
 #define SET_HX_RST (HX1230_PORT |= (1 << HX_RST))
 #define SET_HX_CE  (HX1230_PORT |= (1 << HX_CE))
