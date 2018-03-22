@@ -73,16 +73,16 @@ void track(void)
 	
 	if(abs(up_down_movement_gradient_request) > TRACKING_TOLERANCE)
 	{
-		SG90_INCLINE_DUTY_CYCLE_REGISTER -= up_down_movement_gradient_request / 10;
+		SG90_INCLINE_DUTY_CYCLE_REGISTER -= up_down_movement_gradient_request / 4;
 	}
 	
 	if(abs(left_right_movement_gradient_request) > TRACKING_TOLERANCE)
 	{
-		SG90_ROTATE_DUTY_CYCLE_REGISTER -= left_right_movement_gradient_request / 10;
+		SG90_ROTATE_DUTY_CYCLE_REGISTER -= left_right_movement_gradient_request / 4;
 	}
-	if(SG90_INCLINE_DUTY_CYCLE_REGISTER > SG90_INCLINE_POS_180)
+	if(SG90_INCLINE_DUTY_CYCLE_REGISTER > SG90_UPPER_INCLINE_LIMIT)
 	{
-		SG90_INCLINE_DUTY_CYCLE_REGISTER = SG90_INCLINE_POS_180;
+		SG90_INCLINE_DUTY_CYCLE_REGISTER = SG90_UPPER_INCLINE_LIMIT;
 	}
 	if(SG90_INCLINE_DUTY_CYCLE_REGISTER < SG90_INCLINE_POS_0)
 	{
@@ -96,5 +96,5 @@ void track(void)
 	{
 		SG90_ROTATE_DUTY_CYCLE_REGISTER = SG90_ROTATE_POS_0;
 	}
-	_delay_ms(50);
+	_delay_ms(100);
 }

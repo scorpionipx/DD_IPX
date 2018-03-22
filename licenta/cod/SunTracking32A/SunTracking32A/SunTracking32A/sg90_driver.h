@@ -22,27 +22,29 @@
 #define SG90_INCLINE 0  // servo used to tilt/incline the attached device
 #define SG90_ROTATE 1  // servo used to rotate the attached device
 
-#define SG90_INCLINE_DUTY_CYCLE_REGISTER OCR1A  // attach signal cable to PB1
-#define SG90_ROTATE_DUTY_CYCLE_REGISTER OCR1B  // attach signal cable to PB2
+#define SG90_INCLINE_DUTY_CYCLE_REGISTER OCR1A  // attach signal cable to PD5
+#define SG90_ROTATE_DUTY_CYCLE_REGISTER OCR1B  // attach signal cable to PD4
 
-#define SG90_INCLINE_POS_0_OFFSET -66  // determined by manual testing
-#define SG90_INCLINE_POS_90_OFFSET -35  // determined by manual testing
-#define SG90_INCLINE_POS_180_OFFSET 15  // determined by manual testing
+#define SG90_INCLINE_POS_0_OFFSET 65  // determined by manual testing
+#define SG90_INCLINE_POS_90_OFFSET 40  // determined by manual testing
+#define SG90_INCLINE_POS_180_OFFSET 0  // determined by manual testing
 
-#define SG90_ROTATE_POS_0_OFFSET -66  // determined by manual testing
-#define SG90_ROTATE_POS_90_OFFSET -40  // determined by manual testing
+#define SG90_ROTATE_POS_0_OFFSET 60  // determined by manual testing
+#define SG90_ROTATE_POS_90_OFFSET 37  // determined by manual testing
 #define SG90_ROTATE_POS_180_OFFSET 5  // determined by manual testing
 
-#define SG90_INCLINE_POS_0 IDEAL_SG90_POS_0 + SG90_INCLINE_POS_0_OFFSET
-#define SG90_INCLINE_POS_90 IDEAL_SG90_POS_90 + SG90_INCLINE_POS_90_OFFSET
-#define SG90_INCLINE_POS_180 IDEAL_SG90_POS_180 + SG90_INCLINE_POS_180_OFFSET
+#define SG90_INCLINE_POS_0 IDEAL_SG90_POS_0 - SG90_INCLINE_POS_0_OFFSET
+#define SG90_INCLINE_POS_90 IDEAL_SG90_POS_90 - SG90_INCLINE_POS_90_OFFSET
+#define SG90_INCLINE_POS_180 IDEAL_SG90_POS_180 - SG90_INCLINE_POS_180_OFFSET
 
-#define SG90_ROTATE_POS_0 IDEAL_SG90_POS_0 + SG90_ROTATE_POS_0_OFFSET
-#define SG90_ROTATE_POS_90 IDEAL_SG90_POS_90 + SG90_ROTATE_POS_90_OFFSET
-#define SG90_ROTATE_POS_180 IDEAL_SG90_POS_180 + SG90_ROTATE_POS_180_OFFSET
+#define SG90_ROTATE_POS_0 IDEAL_SG90_POS_0 - SG90_ROTATE_POS_0_OFFSET
+#define SG90_ROTATE_POS_90 IDEAL_SG90_POS_90 - SG90_ROTATE_POS_90_OFFSET
+#define SG90_ROTATE_POS_180 IDEAL_SG90_POS_180 - SG90_ROTATE_POS_180_OFFSET
 
-#define SG90_INCLINE_INIT_POS SG90_INCLINE_POS_90
+#define SG90_INCLINE_INIT_POS SG90_INCLINE_POS_0
 #define SG90_ROTATE_INIT_POS SG90_ROTATE_POS_90
+
+#define SG90_UPPER_INCLINE_LIMIT SG90_INCLINE_POS_90
 
 
 void test_sg90_incline(int number_of_iteration);

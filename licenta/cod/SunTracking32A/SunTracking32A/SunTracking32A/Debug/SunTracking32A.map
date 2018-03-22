@@ -92,9 +92,9 @@ Discarded input sections
  .text.incline_to_angle
                 0x00000000        0xa sg90_driver.o
  .text.test_sg90_incline
-                0x00000000      0x106 sg90_driver.o
+                0x00000000      0x104 sg90_driver.o
  .text.test_sg90_rotate
-                0x00000000      0x106 sg90_driver.o
+                0x00000000      0x104 sg90_driver.o
  .debug_info    0x00000000      0x43c sg90_driver.o
  .debug_abbrev  0x00000000      0x14a sg90_driver.o
  .debug_loc     0x00000000      0x4da sg90_driver.o
@@ -426,7 +426,7 @@ END GROUP
 .rela.plt
  *(.rela.plt)
 
-.text           0x00000000      0xfcc
+.text           0x00000000     0x1274
  *(.vectors)
  .vectors       0x00000000       0x54 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.150/gcc/dev/atmega32a/avr5/crtatmega32a.o
                 0x00000000                __vector_default
@@ -526,102 +526,102 @@ END GROUP
                 0x000002b6       0x32 graphics.o
                 0x000002b6                display_idle_state_message
  .text.display_manual_state_message
-                0x000002e8       0x42 graphics.o
+                0x000002e8       0x62 graphics.o
                 0x000002e8                display_manual_state_message
  .text.display_joystick_data
-                0x0000032a      0x202 graphics.o
-                0x0000032a                display_joystick_data
+                0x0000034a      0x42a graphics.o
+                0x0000034a                display_joystick_data
  .text.hx_send_data
-                0x0000052c       0x34 hx1230.o
-                0x0000052c                hx_send_data
+                0x00000774       0x34 hx1230.o
+                0x00000774                hx_send_data
  .text.hx_send_command
-                0x00000560       0x34 hx1230.o
-                0x00000560                hx_send_command
+                0x000007a8       0x34 hx1230.o
+                0x000007a8                hx_send_command
  .text.init_hx1230_control
-                0x00000594       0x72 hx1230.o
-                0x00000594                init_hx1230_control
+                0x000007dc       0x72 hx1230.o
+                0x000007dc                init_hx1230_control
  .text.hx_set_coordinates
-                0x00000606       0x26 hx1230.o
-                0x00000606                hx_set_coordinates
+                0x0000084e       0x26 hx1230.o
+                0x0000084e                hx_set_coordinates
  .text.hx_clear_screen
-                0x0000062c       0x28 hx1230.o
-                0x0000062c                hx_clear_screen
+                0x00000874       0x28 hx1230.o
+                0x00000874                hx_clear_screen
  .text.hx_fill_screen
-                0x00000654       0x28 hx1230.o
-                0x00000654                hx_fill_screen
+                0x0000089c       0x28 hx1230.o
+                0x0000089c                hx_fill_screen
  .text.hx_write_char
-                0x0000067c       0x48 hx1230.o
-                0x0000067c                hx_write_char
+                0x000008c4       0x48 hx1230.o
+                0x000008c4                hx_write_char
  .text.hx_write_string
-                0x000006c4       0x3a hx1230.o
-                0x000006c4                hx_write_string
+                0x0000090c       0x3a hx1230.o
+                0x0000090c                hx_write_string
  .text.manual_control
-                0x000006fe      0x17e joystick_driver.o
-                0x000006fe                manual_control
+                0x00000946      0x1a2 joystick_driver.o
+                0x00000946                manual_control
  .text.get_filtered_light_intensity
-                0x0000087c       0x5c light.o
-                0x0000087c                get_filtered_light_intensity
- .text.uC_init  0x000008d8       0xa2 main.o
-                0x000008d8                uC_init
- .text.main     0x0000097a       0xa8 main.o
-                0x0000097a                main
+                0x00000ae8       0x5c light.o
+                0x00000ae8                get_filtered_light_intensity
+ .text.uC_init  0x00000b44       0xa2 main.o
+                0x00000b44                uC_init
+ .text.main     0x00000be6       0xa8 main.o
+                0x00000be6                main
  .text.init_pwm_channels
-                0x00000a22       0x30 pwm_driver.o
-                0x00000a22                init_pwm_channels
+                0x00000c8e       0x30 pwm_driver.o
+                0x00000c8e                init_pwm_channels
  .text.turn_on_pwm_channels
-                0x00000a52        0x8 pwm_driver.o
-                0x00000a52                turn_on_pwm_channels
+                0x00000cbe        0x8 pwm_driver.o
+                0x00000cbe                turn_on_pwm_channels
  .text.idle_state_setup
-                0x00000a5a       0x20 state_handler.o
-                0x00000a5a                idle_state_setup
+                0x00000cc6       0x20 state_handler.o
+                0x00000cc6                idle_state_setup
  .text.manual_state_setup
-                0x00000a7a       0x20 state_handler.o
-                0x00000a7a                manual_state_setup
+                0x00000ce6       0x20 state_handler.o
+                0x00000ce6                manual_state_setup
  .text.tracking_state_setup
-                0x00000a9a       0x32 state_handler.o
-                0x00000a9a                tracking_state_setup
+                0x00000d06       0x32 state_handler.o
+                0x00000d06                tracking_state_setup
  .text.go_to_state
-                0x00000acc       0x3a state_handler.o
-                0x00000acc                go_to_state
- .text.track    0x00000b06      0x364 tracking.o
-                0x00000b06                track
+                0x00000d38       0x3a state_handler.o
+                0x00000d38                go_to_state
+ .text.track    0x00000d72      0x3a0 tracking.o
+                0x00000d72                track
  .text.init_next_state_button
-                0x00000e6a       0x12 user_interface.o
-                0x00000e6a                init_next_state_button
+                0x00001112       0x12 user_interface.o
+                0x00001112                init_next_state_button
  .text.init_user_interface
-                0x00000e7c        0x6 user_interface.o
-                0x00000e7c                init_user_interface
+                0x00001124        0x6 user_interface.o
+                0x00001124                init_user_interface
  .text.__vector_1
-                0x00000e82       0x48 user_interface.o
-                0x00000e82                __vector_1
+                0x0000112a       0x48 user_interface.o
+                0x0000112a                __vector_1
  .text.libgcc.div
-                0x00000eca       0x28 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_divmodhi4.o)
-                0x00000eca                _div
-                0x00000eca                __divmodhi4
+                0x00001172       0x28 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_divmodhi4.o)
+                0x00001172                _div
+                0x00001172                __divmodhi4
  .text.libgcc.div
-                0x00000ef2       0x2e c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_divmodsi4.o)
-                0x00000ef2                __divmodsi4
+                0x0000119a       0x2e c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_divmodsi4.o)
+                0x0000119a                __divmodsi4
  .text.libgcc.div
-                0x00000f20       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_negsi2.o)
-                0x00000f20                __negsi2
+                0x000011c8       0x10 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_negsi2.o)
+                0x000011c8                __negsi2
  .text.libgcc.mul
-                0x00000f30       0x1e c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_umulhisi3.o)
-                0x00000f30                __umulhisi3
+                0x000011d8       0x1e c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_umulhisi3.o)
+                0x000011d8                __umulhisi3
  .text.libgcc.mul
-                0x00000f4e        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_usmulhisi3.o)
-                0x00000f4e                __usmulhisi3
-                0x00000f52                __usmulhisi3_tail
+                0x000011f6        0xe c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_usmulhisi3.o)
+                0x000011f6                __usmulhisi3
+                0x000011fa                __usmulhisi3_tail
  .text.libgcc.div
-                0x00000f5c       0x28 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_udivmodhi4.o)
-                0x00000f5c                __udivmodhi4
+                0x00001204       0x28 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_udivmodhi4.o)
+                0x00001204                __udivmodhi4
  .text.libgcc.div
-                0x00000f84       0x44 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_udivmodsi4.o)
-                0x00000f84                __udivmodsi4
-                0x00000fc8                . = ALIGN (0x2)
+                0x0000122c       0x44 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_udivmodsi4.o)
+                0x0000122c                __udivmodsi4
+                0x00001270                . = ALIGN (0x2)
  *(.fini9)
- .fini9         0x00000fc8        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
-                0x00000fc8                _exit
-                0x00000fc8                exit
+ .fini9         0x00001270        0x0 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+                0x00001270                _exit
+                0x00001270                exit
  *(.fini9)
  *(.fini8)
  *(.fini8)
@@ -640,11 +640,11 @@ END GROUP
  *(.fini1)
  *(.fini1)
  *(.fini0)
- .fini0         0x00000fc8        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
+ .fini0         0x00001270        0x4 c:/program files (x86)/atmel/studio/7.0/toolchain/avr8/avr8-gnu-toolchain/bin/../lib/gcc/avr/5.4.0/avr5\libgcc.a(_exit.o)
  *(.fini0)
-                0x00000fcc                _etext = .
+                0x00001274                _etext = .
 
-.data           0x00800060      0x678 load address 0x00000fcc
+.data           0x00800060      0x67e load address 0x00001274
                 0x00800060                PROVIDE (__data_start, .)
  *(.data)
  *(.data*)
@@ -652,43 +652,43 @@ END GROUP
  *(.rodata)
  *(.rodata*)
  .rodata.str1.1
-                0x00800060       0x77 graphics.o
+                0x00800060       0x7d graphics.o
  .rodata.HX_character
-                0x008000d7      0x600 hx1230.o
+                0x008000dd      0x600 hx1230.o
  *(.gnu.linkonce.r*)
-                0x008006d8                . = ALIGN (0x2)
- *fill*         0x008006d7        0x1 
-                0x008006d8                _edata = .
-                0x008006d8                PROVIDE (__data_end, .)
+                0x008006de                . = ALIGN (0x2)
+ *fill*         0x008006dd        0x1 
+                0x008006de                _edata = .
+                0x008006de                PROVIDE (__data_end, .)
 
-.bss            0x008006d8       0x16
-                0x008006d8                PROVIDE (__bss_start, .)
+.bss            0x008006de       0x16
+                0x008006de                PROVIDE (__bss_start, .)
  *(.bss)
  *(.bss*)
  *(COMMON)
- COMMON         0x008006d8        0x2 graphics.o
-                0x008006d8                OLD_STATE
-                0x008006d9                STATE
- COMMON         0x008006da       0x14 tracking.o
-                0x008006da                down_intensity_average
-                0x008006dc                left_intensity_average
-                0x008006de                light_up_right
-                0x008006e0                light_down_right
-                0x008006e2                up_down_movement_gradient_request
-                0x008006e4                left_right_movement_gradient_request
-                0x008006e6                right_intensity_average
-                0x008006e8                light_down_left
-                0x008006ea                up_intensity_average
-                0x008006ec                light_up_left
-                0x008006ee                PROVIDE (__bss_end, .)
-                0x00000fcc                __data_load_start = LOADADDR (.data)
-                0x00001644                __data_load_end = (__data_load_start + SIZEOF (.data))
+ COMMON         0x008006de        0x2 graphics.o
+                0x008006de                OLD_STATE
+                0x008006df                STATE
+ COMMON         0x008006e0       0x14 tracking.o
+                0x008006e0                down_intensity_average
+                0x008006e2                left_intensity_average
+                0x008006e4                light_up_right
+                0x008006e6                light_down_right
+                0x008006e8                up_down_movement_gradient_request
+                0x008006ea                left_right_movement_gradient_request
+                0x008006ec                right_intensity_average
+                0x008006ee                light_down_left
+                0x008006f0                up_intensity_average
+                0x008006f2                light_up_left
+                0x008006f4                PROVIDE (__bss_end, .)
+                0x00001274                __data_load_start = LOADADDR (.data)
+                0x000018f2                __data_load_end = (__data_load_start + SIZEOF (.data))
 
-.noinit         0x008006ee        0x0
+.noinit         0x008006f4        0x0
                 [!provide]                PROVIDE (__noinit_start, .)
  *(.noinit*)
                 [!provide]                PROVIDE (__noinit_end, .)
-                0x008006ee                _end = .
+                0x008006f4                _end = .
                 [!provide]                PROVIDE (__heap_start, .)
 
 .eeprom         0x00810000        0x0
@@ -788,19 +788,19 @@ END GROUP
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x38be
+.debug_info     0x00000000     0x39a2
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x4e6 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.150/gcc/dev/atmega32a/avr5/crtatmega32a.o
  .debug_info    0x000004e6       0xb7 adc_driver.o
- .debug_info    0x0000059d      0xb55 graphics.o
- .debug_info    0x000010f2      0x512 hx1230.o
- .debug_info    0x00001604      0x1e7 joystick_driver.o
- .debug_info    0x000017eb      0x1eb light.o
- .debug_info    0x000019d6      0xa52 main.o
- .debug_info    0x00002428       0xde pwm_driver.o
- .debug_info    0x00002506      0x91a state_handler.o
- .debug_info    0x00002e20      0x9bd tracking.o
- .debug_info    0x000037dd       0xe1 user_interface.o
+ .debug_info    0x0000059d      0xc39 graphics.o
+ .debug_info    0x000011d6      0x512 hx1230.o
+ .debug_info    0x000016e8      0x1e7 joystick_driver.o
+ .debug_info    0x000018cf      0x1eb light.o
+ .debug_info    0x00001aba      0xa52 main.o
+ .debug_info    0x0000250c       0xde pwm_driver.o
+ .debug_info    0x000025ea      0x91a state_handler.o
+ .debug_info    0x00002f04      0x9bd tracking.o
+ .debug_info    0x000038c1       0xe1 user_interface.o
 
 .debug_abbrev   0x00000000      0xf08
  *(.debug_abbrev)
@@ -816,19 +816,19 @@ END GROUP
  .debug_abbrev  0x00000d30      0x139 tracking.o
  .debug_abbrev  0x00000e69       0x9f user_interface.o
 
-.debug_line     0x00000000     0x1417
+.debug_line     0x00000000     0x146b
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x115 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.150/gcc/dev/atmega32a/avr5/crtatmega32a.o
  .debug_line    0x00000115       0xe5 adc_driver.o
- .debug_line    0x000001fa      0x239 graphics.o
- .debug_line    0x00000433      0x382 hx1230.o
- .debug_line    0x000007b5      0x1e8 joystick_driver.o
- .debug_line    0x0000099d      0x121 light.o
- .debug_line    0x00000abe      0x2ba main.o
- .debug_line    0x00000d78      0x109 pwm_driver.o
- .debug_line    0x00000e81      0x21c state_handler.o
- .debug_line    0x0000109d      0x24f tracking.o
- .debug_line    0x000012ec      0x12b user_interface.o
+ .debug_line    0x000001fa      0x28d graphics.o
+ .debug_line    0x00000487      0x382 hx1230.o
+ .debug_line    0x00000809      0x1e8 joystick_driver.o
+ .debug_line    0x000009f1      0x121 light.o
+ .debug_line    0x00000b12      0x2ba main.o
+ .debug_line    0x00000dcc      0x109 pwm_driver.o
+ .debug_line    0x00000ed5      0x21c state_handler.o
+ .debug_line    0x000010f1      0x24f tracking.o
+ .debug_line    0x00001340      0x12b user_interface.o
 
 .debug_frame    0x00000000      0x3a8
  *(.debug_frame)

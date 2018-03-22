@@ -13,7 +13,7 @@ void init_pwm_channels(void)
 	DDRD |= (1 << DDD4)|(1 << DDD5);
 	// PD4 and PD5 as output of 16bits Timer1
 	
-	 ICR1 = 2485;
+	 ICR1 = 2499;
 	 // set TOP to count 20ms
 	 // TOP calculated by the formula: F_PWM = F_CPU/(PRESCALER*(1 + TOP))
 	 // Atmel-42735-8-bit-AVR-Microcontroller-ATmega328-328P_Datasheet, page 164
@@ -27,8 +27,8 @@ void init_pwm_channels(void)
 	 TCCR1A &= ~((1 << COM1A1)|(1 << COM1B1));
 	 // make sure PWM signal is off
 
-	TCCR1B |= (1 << CS11);
-	// START the timer with 8 prescaler
+	TCCR1B |= (1 << CS11 | 1 << CS10);
+	// START the timer with 64 prescaler
 
 	 TCCR1A |= (1 << WGM11);
 	 TCCR1B |= (1 << WGM12)|(1 << WGM13);

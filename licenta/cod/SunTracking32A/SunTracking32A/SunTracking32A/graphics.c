@@ -7,6 +7,7 @@
 
 #include "hx1230.h"
 #include "joystick_driver.h"
+#include "sg90_driver.h"
 #include <stdlib.h>
 
 void display_title(void)
@@ -67,8 +68,13 @@ void display_manual_state_message(void)
 	
 	hx_set_coordinates(0, 6);
 	hx_write_string("JX:");
+	hx_set_coordinates(54, 6);
+	hx_write_string("B:");
+	
 	hx_set_coordinates(0, 7);
 	hx_write_string("JY:");
+	hx_set_coordinates(54, 7);
+	hx_write_string("A:");
 }
 
 void display_joystick_data(unsigned int x, unsigned int y)
@@ -80,10 +86,26 @@ void display_joystick_data(unsigned int x, unsigned int y)
 	hx_write_char('0' + (x / 10) % 10);
 	hx_write_char('0' + x % 10);
 	
+	hx_set_coordinates(72, 6);
+	
+	hx_write_char('0' + SG90_ROTATE_DUTY_CYCLE_REGISTER / 1000);
+	hx_write_char('0' + (SG90_ROTATE_DUTY_CYCLE_REGISTER / 100) % 10);
+	hx_write_char('0' + (SG90_ROTATE_DUTY_CYCLE_REGISTER / 10) % 10);
+	hx_write_char('0' + SG90_ROTATE_DUTY_CYCLE_REGISTER % 10);
+	
 	hx_set_coordinates(24, 7);
 	
 	hx_write_char('0' + y / 1000);
 	hx_write_char('0' + (y / 100) % 10);
 	hx_write_char('0' + (y / 10) % 10);
 	hx_write_char('0' + y % 10);
+	
+	hx_set_coordinates(72, 7);
+	
+	hx_write_char('0' + SG90_INCLINE_DUTY_CYCLE_REGISTER / 1000);
+	hx_write_char('0' + (SG90_INCLINE_DUTY_CYCLE_REGISTER / 100) % 10);
+	hx_write_char('0' + (SG90_INCLINE_DUTY_CYCLE_REGISTER / 10) % 10);
+	hx_write_char('0' + SG90_INCLINE_DUTY_CYCLE_REGISTER % 10);
+	
+	
 }
