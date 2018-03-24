@@ -18,6 +18,7 @@ void go_to_state(unsigned char state);
 void idle_state_setup(void);
 void manual_state_setup(void);
 void tracking_state_setup(void);
+void monitoring_state_setup(void);
 
 
 #endif /* STATE_HANDLER_H_ */

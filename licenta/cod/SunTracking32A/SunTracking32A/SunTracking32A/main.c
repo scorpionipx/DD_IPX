@@ -14,6 +14,7 @@
 #include "user_interface.h"
 #include "state_handler.h"
 #include "joystick_driver.h"
+#include "monitoring.h"
 
 void uC_init(void);
 
@@ -55,6 +56,11 @@ int main(void)
 			case STATE_MANUAL:
 			{
 				manual_control();
+				break;
+			}
+			case STATE_MONITORING:
+			{
+				monitor();
 				break;
 			}
 			default:

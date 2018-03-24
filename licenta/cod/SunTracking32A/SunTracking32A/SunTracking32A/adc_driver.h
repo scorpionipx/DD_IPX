@@ -9,6 +9,8 @@
 #ifndef ADC_DRIVER_H_
 #define ADC_DRIVER_H_
 
+#include <avr/io.h>
+
 #define ADC_MAX 1023
 #define ADC_HALF 512
 

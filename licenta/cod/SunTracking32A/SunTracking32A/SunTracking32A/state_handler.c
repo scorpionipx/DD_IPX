@@ -34,6 +34,12 @@ void go_to_state(unsigned char state)
 			tracking_state_setup();
 			break;
 		}
+		case STATE_MONITORING:
+		{
+			STATE = STATE_MONITORING; // update global state
+			monitoring_state_setup();
+			break;
+		}
 	}
 }
 
@@ -60,4 +66,12 @@ void tracking_state_setup(void)
 	display_title();
 	display_data_menu();
 	_delay_ms(500);
+}
+
+void monitoring_state_setup(void)
+{
+	_delay_ms(200);
+	hx_clear_screen();
+	display_title();
+	display_monitoring_message();
 }

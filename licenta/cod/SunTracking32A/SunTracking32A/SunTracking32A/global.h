@@ -18,6 +18,7 @@ unsigned char OLD_STATE;
 #define STATE_IDLE 1
 #define STATE_MANUAL 2
 #define STATE_TRACKING 3
+#define STATE_MONITORING 4
 
 
 #endif /* GLOBAL_H_ */

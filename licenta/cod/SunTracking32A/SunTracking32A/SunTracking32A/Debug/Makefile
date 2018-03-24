@@ -38,11 +38,13 @@ SUBDIRS :=
 # Add inputs and outputs from these tool invocations to the build variables 
 C_SRCS +=  \
 ../adc_driver.c \
+../charge_driver.c \
 ../graphics.c \
 ../hx1230.c \
 ../joystick_driver.c \
 ../light.c \
 ../main.c \
+../monitoring.c \
 ../pwm_driver.c \
 ../sg90_driver.c \
 ../state_handler.c \
@@ -58,11 +60,13 @@ ASM_SRCS +=
 
 OBJS +=  \
 adc_driver.o \
+charge_driver.o \
 graphics.o \
 hx1230.o \
 joystick_driver.o \
 light.o \
 main.o \
+monitoring.o \
 pwm_driver.o \
 sg90_driver.o \
 state_handler.o \
@@ -71,11 +75,13 @@ user_interface.o
 
 OBJS_AS_ARGS +=  \
 adc_driver.o \
+charge_driver.o \
 graphics.o \
 hx1230.o \
 joystick_driver.o \
 light.o \
 main.o \
+monitoring.o \
 pwm_driver.o \
 sg90_driver.o \
 state_handler.o \
@@ -84,11 +90,13 @@ user_interface.o
 
 C_DEPS +=  \
 adc_driver.d \
+charge_driver.d \
 graphics.d \
 hx1230.d \
 joystick_driver.d \
 light.d \
 main.d \
+monitoring.d \
 pwm_driver.d \
 sg90_driver.d \
 state_handler.d \
@@ -97,11 +105,13 @@ user_interface.d
 
 C_DEPS_AS_ARGS +=  \
 adc_driver.d \
+charge_driver.d \
 graphics.d \
 hx1230.d \
 joystick_driver.d \
 light.d \
 main.d \
+monitoring.d \
 pwm_driver.d \
 sg90_driver.d \
 state_handler.d \
@@ -122,6 +132,10 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
+
+
 
 
 

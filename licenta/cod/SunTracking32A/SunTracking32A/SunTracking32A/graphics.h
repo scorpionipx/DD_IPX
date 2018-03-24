@@ -15,5 +15,6 @@ void display_light_sensor_data(unsigned char sensor, int data);
 void display_idle_state_message(void);
 void display_manual_state_message(void);
 void display_joystick_data(unsigned int x, unsigned int y);
-
+void display_monitoring_message(void);
+void display_monitoring_data(unsigned int v_bat, unsigned int v_chr);
 #endif /* GRAPHICS_H_ */

@@ -50,6 +50,11 @@ ISR (INT0_vect)
 		}
 		case STATE_TRACKING:
 		{
+			STATE = STATE_MONITORING;
+			break;
+		}
+		case STATE_MONITORING:
+		{
 			STATE = STATE_IDLE;
 			break;
 		}

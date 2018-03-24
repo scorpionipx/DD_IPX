@@ -109,3 +109,42 @@ void display_joystick_data(unsigned int x, unsigned int y)
 	
 	
 }
+
+void display_monitoring_message(void)
+{
+	hx_set_coordinates(0, 3);
+	hx_write_string("- system is in ");
+	hx_set_coordinates(0, 4);
+	hx_write_string("MONITORING mode");
+	
+	hx_set_coordinates(0, 6);
+	hx_write_string("Vbat:");
+	hx_set_coordinates(80, 6);
+	hx_write_string("V");
+	
+	hx_set_coordinates(0, 7);
+	hx_write_string("Vchr:");
+	hx_set_coordinates(80, 7);
+	hx_write_string("V");
+}
+
+void display_monitoring_data(unsigned int v_bat, unsigned int v_chr)
+{
+	hx_set_coordinates(42, 6);
+	
+	hx_write_char('0' + v_bat / 10000);
+	hx_write_char('0' + (v_bat / 1000) % 10);
+	hx_write_char('.');
+	hx_write_char('0' + (v_bat / 100) % 10);
+	hx_write_char('0' + (v_bat / 10) % 10);
+	hx_write_char('0' + v_bat % 10);
+	
+	hx_set_coordinates(42, 7);
+	
+	hx_write_char('0' + v_chr / 10000);
+	hx_write_char('0' + (v_chr / 1000) % 10);
+	hx_write_char('.');
+	hx_write_char('0' + (v_chr / 100) % 10);
+	hx_write_char('0' + (v_chr / 10) % 10);
+	hx_write_char('0' + v_chr % 10);
+}

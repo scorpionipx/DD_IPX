@@ -4,6 +4,8 @@
 
 adc_driver.c
 
+charge_driver.c
+
 graphics.c
 
 hx1230.c
@@ -13,6 +15,8 @@ joystick_driver.c
 light.c
 
 main.c
+
+monitoring.c
 
 pwm_driver.c
 
