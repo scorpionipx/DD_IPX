@@ -13,6 +13,7 @@
 #include "graphics.h"
 #include "joystick_driver.h"
 #include "sg90_driver.h"
+#include "unipolar_driver.h"
 
 void manual_control(void)
 {
@@ -24,10 +25,12 @@ void manual_control(void)
 	if(y > (JOYSTICK_IDLE_VALUE + JOYSTICK_DEAD_ZONE))
 	{
 		SG90_INCLINE_DUTY_CYCLE_REGISTER ++;
+		unipolar_01_step_forward(UNIPOLLAR_01_CURRENT_STEP);
 	}
 	else if(y < (JOYSTICK_IDLE_VALUE - JOYSTICK_DEAD_ZONE))
 	{
 		SG90_INCLINE_DUTY_CYCLE_REGISTER --;
+		unipolar_01_step_backward(UNIPOLLAR_01_CURRENT_STEP);
 	}
 	
 	if(x > (JOYSTICK_IDLE_VALUE + JOYSTICK_DEAD_ZONE))

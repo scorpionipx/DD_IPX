@@ -14,6 +14,9 @@
 
 unsigned char STATE;
 unsigned char OLD_STATE;
+
+unsigned char UNIPOLLAR_01_CURRENT_STEP;
+
 #define STATE_INIT 0
 #define STATE_IDLE 1
 #define STATE_MANUAL 2

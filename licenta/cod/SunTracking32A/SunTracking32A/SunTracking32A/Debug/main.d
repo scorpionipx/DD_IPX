@@ -17,7 +17,7 @@ main.d main.o: .././main.c .././global.h \
  .././adc_driver.h .././hx1230.h .././hx_8x6_characters.h .././graphics.h \
  .././light.h .././pwm_driver.h .././sg90_driver.h .././tracking.h \
  .././user_interface.h .././state_handler.h .././joystick_driver.h \
- .././monitoring.h
+ .././monitoring.h .././unipolar_driver.h
 
 .././global.h:
 
@@ -74,3 +74,5 @@ c:\program\ files\ (x86)\atmel\studio\7.0\toolchain\avr8\avr8-gnu-toolchain\avr\
 .././joystick_driver.h:
 
 .././monitoring.h:
+
+.././unipolar_driver.h:

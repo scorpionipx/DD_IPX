@@ -15,6 +15,7 @@
 #include "state_handler.h"
 #include "joystick_driver.h"
 #include "monitoring.h"
+#include "unipolar_driver.h"
 
 void uC_init(void);
 
@@ -32,6 +33,23 @@ int main(void)
 	STATE = STATE_IDLE;
 	/*DDRC = 0xFF;
 	PORTC = 0x00;*/
+	_delay_ms(500);
+	UNIPOLAR_01_SET_STEP_1;
+	_delay_ms(500);
+	UNIPOLAR_01_CLEAR_STEP_1;
+	_delay_ms(500);
+	UNIPOLAR_01_SET_STEP_2;
+	_delay_ms(500);
+	UNIPOLAR_01_CLEAR_STEP_2;
+	_delay_ms(500);
+	UNIPOLAR_01_SET_STEP_3;
+	_delay_ms(500);
+	UNIPOLAR_01_CLEAR_STEP_3;
+	_delay_ms(500);
+	UNIPOLAR_01_SET_STEP_4;
+	_delay_ms(500);
+	UNIPOLAR_01_CLEAR_STEP_4;
+	_delay_ms(500);
 	
 	while (1)
 	{
@@ -55,7 +73,7 @@ int main(void)
 			}
 			case STATE_MANUAL:
 			{
-				manual_control();
+				manua C9+                                                                                                                                                                                                                                                          C  09l_control();
 				break;
 			}
 			case STATE_MONITORING:
@@ -85,6 +103,8 @@ void uC_init(void)
 	
 	init_user_interface();
 	_delay_ms(50);
+	
+	init_unipolar_control();
 	
 	init_hx1230_control();
 	_delay_ms(50);

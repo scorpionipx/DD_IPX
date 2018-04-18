@@ -49,6 +49,7 @@ C_SRCS +=  \
 ../sg90_driver.c \
 ../state_handler.c \
 ../tracking.c \
+../unipolar_driver.c \
 ../user_interface.c
 
 
@@ -71,6 +72,7 @@ pwm_driver.o \
 sg90_driver.o \
 state_handler.o \
 tracking.o \
+unipolar_driver.o \
 user_interface.o
 
 OBJS_AS_ARGS +=  \
@@ -86,6 +88,7 @@ pwm_driver.o \
 sg90_driver.o \
 state_handler.o \
 tracking.o \
+unipolar_driver.o \
 user_interface.o
 
 C_DEPS +=  \
@@ -101,6 +104,7 @@ pwm_driver.d \
 sg90_driver.d \
 state_handler.d \
 tracking.d \
+unipolar_driver.d \
 user_interface.d
 
 C_DEPS_AS_ARGS +=  \
@@ -116,6 +120,7 @@ pwm_driver.d \
 sg90_driver.d \
 state_handler.d \
 tracking.d \
+unipolar_driver.d \
 user_interface.d
 
 OUTPUT_FILE_PATH +=SunTracking32A.elf
@@ -132,6 +137,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 
