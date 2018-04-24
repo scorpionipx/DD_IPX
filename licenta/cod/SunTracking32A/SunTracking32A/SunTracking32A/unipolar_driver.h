@@ -12,6 +12,7 @@
 void init_unipolar_control(void);
 void unipolar_01_step_forward(unsigned char current_step);
 void unipolar_01_step_backward(unsigned char current_step);
+void unipolar_01_clear_steps(void);
 
 #define UNIPOLAR_01_DDR DDRB
 #define UNIPOLAR_01_PORT PORTB

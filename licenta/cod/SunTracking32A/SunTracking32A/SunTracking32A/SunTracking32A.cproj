@@ -156,6 +156,12 @@
     <Compile Include="joystick_driver.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="l293d.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="l293d.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="light.c">
       <SubType>compile</SubType>
     </Compile>

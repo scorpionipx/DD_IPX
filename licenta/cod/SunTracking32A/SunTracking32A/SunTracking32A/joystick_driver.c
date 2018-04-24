@@ -14,6 +14,7 @@
 #include "joystick_driver.h"
 #include "sg90_driver.h"
 #include "unipolar_driver.h"
+#include "l293d.h"
 
 void manual_control(void)
 {
@@ -24,41 +25,30 @@ void manual_control(void)
 	
 	if(y > (JOYSTICK_IDLE_VALUE + JOYSTICK_DEAD_ZONE))
 	{
-		SG90_INCLINE_DUTY_CYCLE_REGISTER ++;
-		unipolar_01_step_forward(UNIPOLLAR_01_CURRENT_STEP);
+		unipolar_01_step_backward(UNIPOLLAR_01_CURRENT_STEP);
 	}
 	else if(y < (JOYSTICK_IDLE_VALUE - JOYSTICK_DEAD_ZONE))
 	{
-		SG90_INCLINE_DUTY_CYCLE_REGISTER --;
-		unipolar_01_step_backward(UNIPOLLAR_01_CURRENT_STEP);
+		unipolar_01_step_forward(UNIPOLLAR_01_CURRENT_STEP);
+	}
+	else
+	{
+		unipolar_01_clear_steps();
 	}
 	
 	if(x > (JOYSTICK_IDLE_VALUE + JOYSTICK_DEAD_ZONE))
 	{
-		SG90_ROTATE_DUTY_CYCLE_REGISTER --;
+		l293d_hb2_rotate_right();
 	}
 	else if(x < (JOYSTICK_IDLE_VALUE - JOYSTICK_DEAD_ZONE))
 	{
-		SG90_ROTATE_DUTY_CYCLE_REGISTER ++;
+		l293d_hb2_rotate_left();
+	}
+	else
+	{
+		l293d_hb2_stop();
 	}
 	
-	
-	if(SG90_INCLINE_DUTY_CYCLE_REGISTER > SG90_UPPER_INCLINE_LIMIT)
-	{
-		SG90_INCLINE_DUTY_CYCLE_REGISTER = SG90_UPPER_INCLINE_LIMIT;
-	}
-	if(SG90_INCLINE_DUTY_CYCLE_REGISTER < SG90_INCLINE_POS_0)
-	{
-		SG90_INCLINE_DUTY_CYCLE_REGISTER = SG90_INCLINE_POS_0;
-	}
-	if(SG90_ROTATE_DUTY_CYCLE_REGISTER > SG90_ROTATE_POS_180)
-	{
-		SG90_ROTATE_DUTY_CYCLE_REGISTER = SG90_ROTATE_POS_180;
-	}
-	if(SG90_ROTATE_DUTY_CYCLE_REGISTER < SG90_ROTATE_POS_0)
-	{
-		SG90_ROTATE_DUTY_CYCLE_REGISTER = SG90_ROTATE_POS_0;
-	}
 	_delay_ms(25);
 }
 

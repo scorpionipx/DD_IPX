@@ -42,6 +42,7 @@ C_SRCS +=  \
 ../graphics.c \
 ../hx1230.c \
 ../joystick_driver.c \
+../l293d.c \
 ../light.c \
 ../main.c \
 ../monitoring.c \
@@ -65,6 +66,7 @@ charge_driver.o \
 graphics.o \
 hx1230.o \
 joystick_driver.o \
+l293d.o \
 light.o \
 main.o \
 monitoring.o \
@@ -81,6 +83,7 @@ charge_driver.o \
 graphics.o \
 hx1230.o \
 joystick_driver.o \
+l293d.o \
 light.o \
 main.o \
 monitoring.o \
@@ -97,6 +100,7 @@ charge_driver.d \
 graphics.d \
 hx1230.d \
 joystick_driver.d \
+l293d.d \
 light.d \
 main.d \
 monitoring.d \
@@ -113,6 +117,7 @@ charge_driver.d \
 graphics.d \
 hx1230.d \
 joystick_driver.d \
+l293d.d \
 light.d \
 main.d \
 monitoring.d \
@@ -137,6 +142,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

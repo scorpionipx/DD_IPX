@@ -10,9 +10,14 @@
 #include "graphics.h"
 #include "state_handler.h"
 #include "hx1230.h"
+#include "unipolar_driver.h"
+#include "l293d.h"
 
 void go_to_state(unsigned char state)
 {
+	l293d_hb2_stop();  /* make sure motor control is turned off when changing states */
+	unipolar_01_clear_steps();  /* make sure motor control is turned off when changing states */
+	
 	hx_clear_screen();
 	switch(state)
 	{

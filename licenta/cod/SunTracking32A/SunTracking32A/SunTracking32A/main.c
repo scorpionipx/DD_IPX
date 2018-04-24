@@ -16,6 +16,7 @@
 #include "joystick_driver.h"
 #include "monitoring.h"
 #include "unipolar_driver.h"
+#include "l293d.h"
 
 void uC_init(void);
 
@@ -25,31 +26,7 @@ int main(void)
 	OLD_STATE = STATE_INIT;
 	uC_init();
 	
-	SG90_INCLINE_DUTY_CYCLE_REGISTER = SG90_INCLINE_POS_0;
-	SG90_ROTATE_DUTY_CYCLE_REGISTER = SG90_ROTATE_POS_90;
-	turn_on_pwm_channels();
-	
-	
 	STATE = STATE_IDLE;
-	/*DDRC = 0xFF;
-	PORTC = 0x00;*/
-	_delay_ms(500);
-	UNIPOLAR_01_SET_STEP_1;
-	_delay_ms(500);
-	UNIPOLAR_01_CLEAR_STEP_1;
-	_delay_ms(500);
-	UNIPOLAR_01_SET_STEP_2;
-	_delay_ms(500);
-	UNIPOLAR_01_CLEAR_STEP_2;
-	_delay_ms(500);
-	UNIPOLAR_01_SET_STEP_3;
-	_delay_ms(500);
-	UNIPOLAR_01_CLEAR_STEP_3;
-	_delay_ms(500);
-	UNIPOLAR_01_SET_STEP_4;
-	_delay_ms(500);
-	UNIPOLAR_01_CLEAR_STEP_4;
-	_delay_ms(500);
 	
 	while (1)
 	{
@@ -73,7 +50,7 @@ int main(void)
 			}
 			case STATE_MANUAL:
 			{
-				manua C9+                                                                                                                                                                                                                                                          C  09l_control();
+				manual_control();
 				break;
 			}
 			case STATE_MONITORING:
@@ -98,13 +75,14 @@ void uC_init(void)
 	ADC_init();
 	_delay_ms(50);
 	
-	init_pwm_channels();
-	_delay_ms(50);
-	
 	init_user_interface();
 	_delay_ms(50);
 	
 	init_unipolar_control();
+	_delay_ms(50);
+	
+	init_l293d_control();
+	_delay_ms(50);
 	
 	init_hx1230_control();
 	_delay_ms(50);

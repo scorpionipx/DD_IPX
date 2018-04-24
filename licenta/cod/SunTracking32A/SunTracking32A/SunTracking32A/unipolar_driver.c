@@ -107,3 +107,11 @@ void unipolar_01_step_backward(unsigned char current_step)
 	}
 	_delay_ms(3);
 }
+
+void unipolar_01_clear_steps(void)
+{
+	UNIPOLAR_01_CLEAR_STEP_1;
+	UNIPOLAR_01_CLEAR_STEP_2;
+	UNIPOLAR_01_CLEAR_STEP_3;
+	UNIPOLAR_01_CLEAR_STEP_4;
+}
