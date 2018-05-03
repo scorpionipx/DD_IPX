@@ -48,6 +48,7 @@ C_SRCS +=  \
 ../monitoring.c \
 ../pwm_driver.c \
 ../sg90_driver.c \
+../stand_control.c \
 ../state_handler.c \
 ../tracking.c \
 ../unipolar_driver.c \
@@ -72,6 +73,7 @@ main.o \
 monitoring.o \
 pwm_driver.o \
 sg90_driver.o \
+stand_control.o \
 state_handler.o \
 tracking.o \
 unipolar_driver.o \
@@ -89,6 +91,7 @@ main.o \
 monitoring.o \
 pwm_driver.o \
 sg90_driver.o \
+stand_control.o \
 state_handler.o \
 tracking.o \
 unipolar_driver.o \
@@ -106,6 +109,7 @@ main.d \
 monitoring.d \
 pwm_driver.d \
 sg90_driver.d \
+stand_control.d \
 state_handler.d \
 tracking.d \
 unipolar_driver.d \
@@ -123,6 +127,7 @@ main.d \
 monitoring.d \
 pwm_driver.d \
 sg90_driver.d \
+stand_control.d \
 state_handler.d \
 tracking.d \
 unipolar_driver.d \
@@ -142,6 +147,8 @@ LINKER_SCRIPT_DEP+=
 
 
 # AVR32/GNU C Compiler
+
+
 
 
 

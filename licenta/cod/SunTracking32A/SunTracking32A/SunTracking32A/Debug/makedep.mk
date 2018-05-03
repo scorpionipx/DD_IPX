@@ -24,6 +24,8 @@ pwm_driver.c
 
 sg90_driver.c
 
+stand_control.c
+
 state_handler.c
 
 tracking.c

@@ -13,7 +13,7 @@
 #include "light.h"
 #include "hx1230.h"
 #include "graphics.h"
-#include "sg90_driver.h"
+#include "stand_control.h"
 
 int light_up_left;
 int light_up_right;
@@ -71,30 +71,36 @@ void track(void)
 	up_down_movement_gradient_request = up_intensity_average - down_intensity_average;
 	left_right_movement_gradient_request = left_intensity_average - right_intensity_average;
 	
-	if(abs(up_down_movement_gradient_request) > TRACKING_TOLERANCE)
+	if(abs(up_down_movement_gradient_request) > INCLINE_TRACKING_TOLERANCE)
 	{
-		SG90_INCLINE_DUTY_CYCLE_REGISTER -= up_down_movement_gradient_request / 4;
+		if(up_down_movement_gradient_request > 0)
+		{
+			stand_incline_up();
+		}
+		else
+		{
+			stand_incline_down();
+		}
+	}
+	else
+	{
+		stand_stop_incline();
 	}
 	
-	if(abs(left_right_movement_gradient_request) > TRACKING_TOLERANCE)
+	if(abs(left_right_movement_gradient_request) > ROTATE_TRACKING_TOLERANCE)
 	{
-		SG90_ROTATE_DUTY_CYCLE_REGISTER -= left_right_movement_gradient_request / 4;
+		if(left_right_movement_gradient_request > 0)
+		{
+			stand_rotate_right();
+		}
+		else
+		{
+			stand_rotate_left();
+		}
 	}
-	if(SG90_INCLINE_DUTY_CYCLE_REGISTER > SG90_UPPER_INCLINE_LIMIT)
+	else
 	{
-		SG90_INCLINE_DUTY_CYCLE_REGISTER = SG90_UPPER_INCLINE_LIMIT;
+		stand_stop_rotation();
 	}
-	if(SG90_INCLINE_DUTY_CYCLE_REGISTER < SG90_INCLINE_POS_0)
-	{
-		SG90_INCLINE_DUTY_CYCLE_REGISTER = SG90_INCLINE_POS_0;
-	}
-	if(SG90_ROTATE_DUTY_CYCLE_REGISTER > SG90_ROTATE_POS_180)
-	{
-		SG90_ROTATE_DUTY_CYCLE_REGISTER = SG90_ROTATE_POS_180;
-	}
-	if(SG90_ROTATE_DUTY_CYCLE_REGISTER < SG90_ROTATE_POS_0)
-	{
-		SG90_ROTATE_DUTY_CYCLE_REGISTER = SG90_ROTATE_POS_0;
-	}
-	_delay_ms(100);
+	_delay_ms(40);
 }
