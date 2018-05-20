@@ -30,9 +30,6 @@ int main(void)
 	
 	while (1)
 	{
-		/*PORTC = ~PORTC;
-		_delay_ms(100);*/
-		
 		if(STATE_CHANGED)
 		{
 			OLD_STATE = STATE; // update state

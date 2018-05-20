@@ -2383,11 +2383,9 @@ int main(void)
 	STATE = STATE_IDLE;
      eba:	81 e0       	ldi	r24, 0x01	; 1
      ebc:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
+	
 	while (1)
 	{
-		/*PORTC = ~PORTC;
-		_delay_ms(100);*/
-		
 		if(STATE_CHANGED)
      ec0:	80 91 fe 06 	lds	r24, 0x06FE	; 0x8006fe <STATE>
      ec4:	90 91 fc 06 	lds	r25, 0x06FC	; 0x8006fc <__data_end>
