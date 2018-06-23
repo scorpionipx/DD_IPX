@@ -9,7 +9,8 @@
 #ifndef TRACKING_H_
 #define TRACKING_H_
 
-#define TRACKING_TOLERANCE 2
+#define INCLINE_TRACKING_TOLERANCE 2
+#define ROTATE_TRACKING_TOLERANCE 2
 
 void track(void);
 

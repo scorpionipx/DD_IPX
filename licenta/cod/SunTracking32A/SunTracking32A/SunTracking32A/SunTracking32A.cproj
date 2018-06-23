@@ -189,6 +189,12 @@
     <Compile Include="sg90_driver.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="stand_control.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="stand_control.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="state_handler.c">
       <SubType>compile</SubType>
     </Compile>
