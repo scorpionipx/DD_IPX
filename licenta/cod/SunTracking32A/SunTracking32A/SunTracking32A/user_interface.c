@@ -27,8 +27,6 @@ void init_next_state_button(void)
 	BUTTON_1_PORT |= (1 << BUTTON_1_PIN);    // turn on the pull-up resistor
 	// PD2 is now an input with pull-up enabled
 
-
-
 	MCUCR &= ~(1 << ISC00 | 1 << ISC01);    // low level of INT0 generates an interrupt request: when BUTTON_1 is pressed
 	GICR |= (1 << INT0);     // turns on INT0
 }
