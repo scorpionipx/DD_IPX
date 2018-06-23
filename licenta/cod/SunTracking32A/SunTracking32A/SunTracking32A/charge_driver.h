@@ -19,9 +19,9 @@
 #define V_BAT_GAIN 975  // as unit of 1000
 #define V_CHR_GAIL 975  // as unit of 1000
 
-#define RELAY_PIN PIND2
-#define RELAY_PORT PORTD
-#define RELAY_DDR DDRD
+#define RELAY_PIN PINB4
+#define RELAY_PORT PORTB
+#define RELAY_DDR DDRB
 #define TURN_ON_RELAY (RELAY_PORT |= 1 << RELAY_PIN)
 #define TURN_OFF_RELAY (RELAY_PORT &= ~(1 << RELAY_PIN))
 
