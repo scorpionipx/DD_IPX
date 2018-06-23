@@ -13,21 +13,21 @@ Idx Name          Size      VMA       LMA       File off  Algn
                   CONTENTS, READONLY
   4 .note.gnu.avr.deviceinfo 0000003c  00000000  00000000  00001c88  2**2
                   CONTENTS, READONLY
-  5 .debug_aranges 000002e8  00000000  00000000  00001cc4  2**0
+  5 .debug_aranges 00000300  00000000  00000000  00001cc4  2**0
                   CONTENTS, READONLY, DEBUGGING
-  6 .debug_info   00004547  00000000  00000000  00001fac  2**0
+  6 .debug_info   00004594  00000000  00000000  00001fc4  2**0
                   CONTENTS, READONLY, DEBUGGING
-  7 .debug_abbrev 0000127c  00000000  00000000  000064f3  2**0
+  7 .debug_abbrev 000012a1  00000000  00000000  00006558  2**0
                   CONTENTS, READONLY, DEBUGGING
-  8 .debug_line   00001bdf  00000000  00000000  0000776f  2**0
+  8 .debug_line   00001c89  00000000  00000000  000077f9  2**0
                   CONTENTS, READONLY, DEBUGGING
-  9 .debug_frame  00000534  00000000  00000000  00009350  2**2
+  9 .debug_frame  00000564  00000000  00000000  00009484  2**2
                   CONTENTS, READONLY, DEBUGGING
- 10 .debug_str    00000984  00000000  00000000  00009884  2**0
+ 10 .debug_str    00000a21  00000000  00000000  000099e8  2**0
                   CONTENTS, READONLY, DEBUGGING
- 11 .debug_loc    000011cc  00000000  00000000  0000a208  2**0
+ 11 .debug_loc    000011cc  00000000  00000000  0000a409  2**0
                   CONTENTS, READONLY, DEBUGGING
- 12 .debug_ranges 00000208  00000000  00000000  0000b3d4  2**0
+ 12 .debug_ranges 00000220  00000000  00000000  0000b5d5  2**0
                   CONTENTS, READONLY, DEBUGGING
 
 Disassembly of section .text:
@@ -96,58 +96,29 @@ Disassembly of section .text:
       8e:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
 
 00000092 <ADC_init>:
-
-#include <avr/io.h>
-
-void ADC_init(void)
-{
-	DDRC = 0x00;
       92:	14 ba       	out	0x14, r1	; 20
-	// AREF = AVcc
-	ADMUX = (1<<REFS0);
       94:	80 e4       	ldi	r24, 0x40	; 64
       96:	87 b9       	out	0x07, r24	; 7
-	
-	// ADC Enable and prescaler of 128
-	// 16000000/128 = 125000
-	ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
       98:	87 e8       	ldi	r24, 0x87	; 135
       9a:	86 b9       	out	0x06, r24	; 6
       9c:	08 95       	ret
 
 0000009e <ADC_get_value>:
-{
-	// select the corresponding channel 0~7
-	// ANDing with '7' will always keep the value
-	// of 'ch' between 0 and 7
-	ch &= 0b00000111;  // AND operation with 7
-	ADMUX = (ADMUX & 0xF8)|ch;     // clears the bottom 3 bits before ORing
       9e:	97 b1       	in	r25, 0x07	; 7
       a0:	98 7f       	andi	r25, 0xF8	; 248
       a2:	87 70       	andi	r24, 0x07	; 7
       a4:	89 2b       	or	r24, r25
       a6:	87 b9       	out	0x07, r24	; 7
-	
-	// start single conversion
-	// write '1' to ADSC
-	ADCSRA |= (1<<ADSC);
       a8:	36 9a       	sbi	0x06, 6	; 6
-	
-	// wait for conversion to complete
-	// ADSC becomes '0' again
-	// till then, run loop continuously
-	while(ADCSRA & (1<<ADSC));
       aa:	36 99       	sbic	0x06, 6	; 6
       ac:	fe cf       	rjmp	.-4      	; 0xaa <ADC_get_value+0xc>
-	
-	return (ADC);
       ae:	84 b1       	in	r24, 0x04	; 4
       b0:	95 b1       	in	r25, 0x05	; 5
       b2:	08 95       	ret
 
 000000b4 <get_battery_voltage>:
-#include "charge_driver.h"
-#include "adc_driver.h"
+	TURN_OFF_RELAY;
+}
 
 unsigned int get_battery_voltage(void)
 {
@@ -213,70 +184,45 @@ unsigned int get_converter_voltage(void)
      122:	08 95       	ret
 
 00000124 <display_title>:
-#include "sg90_driver.h"
-#include <stdlib.h>
-
-void display_title(void)
-{
-	hx_set_coordinates(0, 0);
      124:	60 e0       	ldi	r22, 0x00	; 0
      126:	80 e0       	ldi	r24, 0x00	; 0
      128:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("AutoTracking LDR");
      12c:	80 e6       	ldi	r24, 0x60	; 96
      12e:	90 e0       	ldi	r25, 0x00	; 0
      130:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	hx_set_coordinates(0, 1);
      134:	61 e0       	ldi	r22, 0x01	; 1
      136:	80 e0       	ldi	r24, 0x00	; 0
      138:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("  ScorpionIPX");
      13c:	81 e7       	ldi	r24, 0x71	; 113
      13e:	90 e0       	ldi	r25, 0x00	; 0
      140:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
      144:	08 95       	ret
 
 00000146 <display_data_menu>:
-}
-
-void display_data_menu(void)
-{
-	hx_set_coordinates(0, 3);
      146:	63 e0       	ldi	r22, 0x03	; 3
      148:	80 e0       	ldi	r24, 0x00	; 0
      14a:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("       ||");
      14e:	8f e7       	ldi	r24, 0x7F	; 127
      150:	90 e0       	ldi	r25, 0x00	; 0
      152:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	hx_set_coordinates(0, 4);
      156:	64 e0       	ldi	r22, 0x04	; 4
      158:	80 e0       	ldi	r24, 0x00	; 0
      15a:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("================");
      15e:	89 e8       	ldi	r24, 0x89	; 137
      160:	90 e0       	ldi	r25, 0x00	; 0
      162:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	hx_set_coordinates(0, 5);
      166:	65 e0       	ldi	r22, 0x05	; 5
      168:	80 e0       	ldi	r24, 0x00	; 0
      16a:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("       ||");
      16e:	8f e7       	ldi	r24, 0x7F	; 127
      170:	90 e0       	ldi	r25, 0x00	; 0
      172:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
      176:	08 95       	ret
 
 00000178 <display_light_sensor_data>:
-}
-
-void display_light_sensor_data(uint8_t sensor, int data)
-{
      178:	cf 93       	push	r28
      17a:	df 93       	push	r29
      17c:	eb 01       	movw	r28, r22
-	//hx_set_coordinates(60, 3 + sensor);
-	hx_set_coordinates(24 + 36 * (sensor & 1), 3 + 2 * (sensor >> 1));
      17e:	68 2f       	mov	r22, r24
      180:	6e 7f       	andi	r22, 0xFE	; 254
      182:	6d 5f       	subi	r22, 0xFD	; 253
@@ -287,9 +233,6 @@ void display_light_sensor_data(uint8_t sensor, int data)
      18c:	11 24       	eor	r1, r1
      18e:	88 5e       	subi	r24, 0xE8	; 232
      190:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	
-	// hx_write_char('0' + ((data / 100) % 10));
-	hx_write_char('0' + ((data / 10) % 10));
      194:	2a e0       	ldi	r18, 0x0A	; 10
      196:	30 e0       	ldi	r19, 0x00	; 0
      198:	ce 01       	movw	r24, r28
@@ -301,16 +244,12 @@ void display_light_sensor_data(uint8_t sensor, int data)
      1a6:	0e 94 07 0a 	call	0x140e	; 0x140e <__divmodhi4>
      1aa:	80 5d       	subi	r24, 0xD0	; 208
      1ac:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (data % 10));
      1b0:	80 e3       	ldi	r24, 0x30	; 48
      1b2:	8c 0f       	add	r24, r28
      1b4:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	
-	hx_set_coordinates(18, 7);
      1b8:	67 e0       	ldi	r22, 0x07	; 7
      1ba:	82 e1       	ldi	r24, 0x12	; 18
      1bc:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_char('0' + OCR1A / 100);
      1c0:	2a b5       	in	r18, 0x2a	; 42
      1c2:	3b b5       	in	r19, 0x2b	; 43
      1c4:	36 95       	lsr	r19
@@ -324,7 +263,6 @@ void display_light_sensor_data(uint8_t sensor, int data)
      1d6:	87 95       	ror	r24
      1d8:	80 5d       	subi	r24, 0xD0	; 208
      1da:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (OCR1A / 10) % 10);
      1de:	2a b5       	in	r18, 0x2a	; 42
      1e0:	3b b5       	in	r19, 0x2b	; 43
      1e2:	ad ec       	ldi	r26, 0xCD	; 205
@@ -362,7 +300,6 @@ void display_light_sensor_data(uint8_t sensor, int data)
      226:	c9 01       	movw	r24, r18
      228:	80 5d       	subi	r24, 0xD0	; 208
      22a:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + OCR1A % 10);
      22e:	4a b5       	in	r20, 0x2a	; 42
      230:	5b b5       	in	r21, 0x2b	; 43
      232:	9a 01       	movw	r18, r20
@@ -392,12 +329,9 @@ void display_light_sensor_data(uint8_t sensor, int data)
      264:	c9 01       	movw	r24, r18
      266:	80 5d       	subi	r24, 0xD0	; 208
      268:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	
-	hx_set_coordinates(66, 7);
      26c:	67 e0       	ldi	r22, 0x07	; 7
      26e:	82 e4       	ldi	r24, 0x42	; 66
      270:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_char('0' + OCR1B / 100);
      274:	28 b5       	in	r18, 0x28	; 40
      276:	39 b5       	in	r19, 0x29	; 41
      278:	36 95       	lsr	r19
@@ -411,7 +345,6 @@ void display_light_sensor_data(uint8_t sensor, int data)
      28a:	87 95       	ror	r24
      28c:	80 5d       	subi	r24, 0xD0	; 208
      28e:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (OCR1B / 10) % 10);
      292:	28 b5       	in	r18, 0x28	; 40
      294:	39 b5       	in	r19, 0x29	; 41
      296:	ad ec       	ldi	r26, 0xCD	; 205
@@ -449,7 +382,6 @@ void display_light_sensor_data(uint8_t sensor, int data)
      2da:	c9 01       	movw	r24, r18
      2dc:	80 5d       	subi	r24, 0xD0	; 208
      2de:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + OCR1B % 10);
      2e2:	48 b5       	in	r20, 0x28	; 40
      2e4:	59 b5       	in	r21, 0x29	; 41
      2e6:	9a 01       	movw	r18, r20
@@ -479,104 +411,71 @@ void display_light_sensor_data(uint8_t sensor, int data)
      318:	c9 01       	movw	r24, r18
      31a:	80 5d       	subi	r24, 0xD0	; 208
      31c:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-}
      320:	df 91       	pop	r29
      322:	cf 91       	pop	r28
      324:	08 95       	ret
 
 00000326 <display_idle_state_message>:
-
-void display_idle_state_message(void)
-{
-	hx_set_coordinates(0, 3);
      326:	63 e0       	ldi	r22, 0x03	; 3
      328:	80 e0       	ldi	r24, 0x00	; 0
      32a:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("- system is in ");
      32e:	8a e9       	ldi	r24, 0x9A	; 154
      330:	90 e0       	ldi	r25, 0x00	; 0
      332:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	hx_set_coordinates(0, 4);
      336:	64 e0       	ldi	r22, 0x04	; 4
      338:	80 e0       	ldi	r24, 0x00	; 0
      33a:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("IDLE mode");
      33e:	8a ea       	ldi	r24, 0xAA	; 170
      340:	90 e0       	ldi	r25, 0x00	; 0
      342:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	hx_set_coordinates(0, 6);
      346:	66 e0       	ldi	r22, 0x06	; 6
      348:	80 e0       	ldi	r24, 0x00	; 0
      34a:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("going to sleep");
      34e:	84 eb       	ldi	r24, 0xB4	; 180
      350:	90 e0       	ldi	r25, 0x00	; 0
      352:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
      356:	08 95       	ret
 
 00000358 <display_manual_state_message>:
-}
-
-
-void display_manual_state_message(void)
-{
-	hx_set_coordinates(0, 3);
      358:	63 e0       	ldi	r22, 0x03	; 3
      35a:	80 e0       	ldi	r24, 0x00	; 0
      35c:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("- system is in ");
      360:	8a e9       	ldi	r24, 0x9A	; 154
      362:	90 e0       	ldi	r25, 0x00	; 0
      364:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	hx_set_coordinates(0, 4);
      368:	64 e0       	ldi	r22, 0x04	; 4
      36a:	80 e0       	ldi	r24, 0x00	; 0
      36c:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("MANUAL mode");
      370:	83 ec       	ldi	r24, 0xC3	; 195
      372:	90 e0       	ldi	r25, 0x00	; 0
      374:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	
-	hx_set_coordinates(0, 6);
      378:	66 e0       	ldi	r22, 0x06	; 6
      37a:	80 e0       	ldi	r24, 0x00	; 0
      37c:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("JX:");
      380:	8f ec       	ldi	r24, 0xCF	; 207
      382:	90 e0       	ldi	r25, 0x00	; 0
      384:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	hx_set_coordinates(54, 6);
      388:	66 e0       	ldi	r22, 0x06	; 6
      38a:	86 e3       	ldi	r24, 0x36	; 54
      38c:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("B:");
      390:	83 ed       	ldi	r24, 0xD3	; 211
      392:	90 e0       	ldi	r25, 0x00	; 0
      394:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	
-	hx_set_coordinates(0, 7);
      398:	67 e0       	ldi	r22, 0x07	; 7
      39a:	80 e0       	ldi	r24, 0x00	; 0
      39c:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("JY:");
      3a0:	86 ed       	ldi	r24, 0xD6	; 214
      3a2:	90 e0       	ldi	r25, 0x00	; 0
      3a4:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	hx_set_coordinates(54, 7);
      3a8:	67 e0       	ldi	r22, 0x07	; 7
      3aa:	86 e3       	ldi	r24, 0x36	; 54
      3ac:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("A:");
      3b0:	8a ed       	ldi	r24, 0xDA	; 218
      3b2:	90 e0       	ldi	r25, 0x00	; 0
      3b4:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
      3b8:	08 95       	ret
 
 000003ba <display_joystick_data>:
-}
-
-void display_joystick_data(unsigned int x, unsigned int y)
-{	 
      3ba:	ef 92       	push	r14
      3bc:	ff 92       	push	r15
      3be:	0f 93       	push	r16
@@ -585,12 +484,9 @@ void display_joystick_data(unsigned int x, unsigned int y)
      3c4:	df 93       	push	r29
      3c6:	7c 01       	movw	r14, r24
      3c8:	8b 01       	movw	r16, r22
-	hx_set_coordinates(24, 6);
      3ca:	66 e0       	ldi	r22, 0x06	; 6
      3cc:	88 e1       	ldi	r24, 0x18	; 24
      3ce:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	
-	hx_write_char('0' + x / 1000);
      3d2:	97 01       	movw	r18, r14
      3d4:	36 95       	lsr	r19
      3d6:	27 95       	ror	r18
@@ -609,7 +505,6 @@ void display_joystick_data(unsigned int x, unsigned int y)
      3f2:	89 27       	eor	r24, r25
      3f4:	80 5d       	subi	r24, 0xD0	; 208
      3f6:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (x / 100) % 10);
      3fa:	97 01       	movw	r18, r14
      3fc:	36 95       	lsr	r19
      3fe:	27 95       	ror	r18
@@ -648,7 +543,6 @@ void display_joystick_data(unsigned int x, unsigned int y)
      444:	c9 01       	movw	r24, r18
      446:	80 5d       	subi	r24, 0xD0	; 208
      448:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (x / 10) % 10);
      44c:	97 01       	movw	r18, r14
      44e:	ad ec       	ldi	r26, 0xCD	; 205
      450:	bc ec       	ldi	r27, 0xCC	; 204
@@ -685,7 +579,6 @@ void display_joystick_data(unsigned int x, unsigned int y)
      492:	c9 01       	movw	r24, r18
      494:	80 5d       	subi	r24, 0xD0	; 208
      496:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + x % 10);
      49a:	ce 01       	movw	r24, r28
      49c:	88 0f       	add	r24, r24
      49e:	99 1f       	adc	r25, r25
@@ -702,13 +595,9 @@ void display_joystick_data(unsigned int x, unsigned int y)
      4b4:	9d 0b       	sbc	r25, r29
      4b6:	80 5d       	subi	r24, 0xD0	; 208
      4b8:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	
-	hx_set_coordinates(72, 6);
      4bc:	66 e0       	ldi	r22, 0x06	; 6
      4be:	88 e4       	ldi	r24, 0x48	; 72
      4c0:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	
-	hx_write_char('0' + SG90_ROTATE_DUTY_CYCLE_REGISTER / 1000);
      4c4:	28 b5       	in	r18, 0x28	; 40
      4c6:	39 b5       	in	r19, 0x29	; 41
      4c8:	36 95       	lsr	r19
@@ -728,7 +617,6 @@ void display_joystick_data(unsigned int x, unsigned int y)
      4e6:	89 27       	eor	r24, r25
      4e8:	80 5d       	subi	r24, 0xD0	; 208
      4ea:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (SG90_ROTATE_DUTY_CYCLE_REGISTER / 100) % 10);
      4ee:	28 b5       	in	r18, 0x28	; 40
      4f0:	39 b5       	in	r19, 0x29	; 41
      4f2:	36 95       	lsr	r19
@@ -768,7 +656,6 @@ void display_joystick_data(unsigned int x, unsigned int y)
      53a:	c9 01       	movw	r24, r18
      53c:	80 5d       	subi	r24, 0xD0	; 208
      53e:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (SG90_ROTATE_DUTY_CYCLE_REGISTER / 10) % 10);
      542:	28 b5       	in	r18, 0x28	; 40
      544:	39 b5       	in	r19, 0x29	; 41
      546:	ad ec       	ldi	r26, 0xCD	; 205
@@ -806,7 +693,6 @@ void display_joystick_data(unsigned int x, unsigned int y)
      58a:	c9 01       	movw	r24, r18
      58c:	80 5d       	subi	r24, 0xD0	; 208
      58e:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + SG90_ROTATE_DUTY_CYCLE_REGISTER % 10);
      592:	48 b5       	in	r20, 0x28	; 40
      594:	59 b5       	in	r21, 0x29	; 41
      596:	9a 01       	movw	r18, r20
@@ -836,13 +722,9 @@ void display_joystick_data(unsigned int x, unsigned int y)
      5c8:	c9 01       	movw	r24, r18
      5ca:	80 5d       	subi	r24, 0xD0	; 208
      5cc:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	
-	hx_set_coordinates(24, 7);
      5d0:	67 e0       	ldi	r22, 0x07	; 7
      5d2:	88 e1       	ldi	r24, 0x18	; 24
      5d4:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	
-	hx_write_char('0' + y / 1000);
      5d8:	98 01       	movw	r18, r16
      5da:	36 95       	lsr	r19
      5dc:	27 95       	ror	r18
@@ -861,7 +743,6 @@ void display_joystick_data(unsigned int x, unsigned int y)
      5f8:	89 27       	eor	r24, r25
      5fa:	80 5d       	subi	r24, 0xD0	; 208
      5fc:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (y / 100) % 10);
      600:	98 01       	movw	r18, r16
      602:	36 95       	lsr	r19
      604:	27 95       	ror	r18
@@ -900,7 +781,6 @@ void display_joystick_data(unsigned int x, unsigned int y)
      64a:	c9 01       	movw	r24, r18
      64c:	80 5d       	subi	r24, 0xD0	; 208
      64e:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (y / 10) % 10);
      652:	98 01       	movw	r18, r16
      654:	ad ec       	ldi	r26, 0xCD	; 205
      656:	bc ec       	ldi	r27, 0xCC	; 204
@@ -937,7 +817,6 @@ void display_joystick_data(unsigned int x, unsigned int y)
      698:	c9 01       	movw	r24, r18
      69a:	80 5d       	subi	r24, 0xD0	; 208
      69c:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + y % 10);
      6a0:	ce 01       	movw	r24, r28
      6a2:	88 0f       	add	r24, r24
      6a4:	99 1f       	adc	r25, r25
@@ -954,13 +833,9 @@ void display_joystick_data(unsigned int x, unsigned int y)
      6ba:	9d 0b       	sbc	r25, r29
      6bc:	80 5d       	subi	r24, 0xD0	; 208
      6be:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	
-	hx_set_coordinates(72, 7);
      6c2:	67 e0       	ldi	r22, 0x07	; 7
      6c4:	88 e4       	ldi	r24, 0x48	; 72
      6c6:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	
-	hx_write_char('0' + SG90_INCLINE_DUTY_CYCLE_REGISTER / 1000);
      6ca:	2a b5       	in	r18, 0x2a	; 42
      6cc:	3b b5       	in	r19, 0x2b	; 43
      6ce:	36 95       	lsr	r19
@@ -980,7 +855,6 @@ void display_joystick_data(unsigned int x, unsigned int y)
      6ec:	89 27       	eor	r24, r25
      6ee:	80 5d       	subi	r24, 0xD0	; 208
      6f0:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (SG90_INCLINE_DUTY_CYCLE_REGISTER / 100) % 10);
      6f4:	2a b5       	in	r18, 0x2a	; 42
      6f6:	3b b5       	in	r19, 0x2b	; 43
      6f8:	36 95       	lsr	r19
@@ -1020,7 +894,6 @@ void display_joystick_data(unsigned int x, unsigned int y)
      740:	c9 01       	movw	r24, r18
      742:	80 5d       	subi	r24, 0xD0	; 208
      744:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (SG90_INCLINE_DUTY_CYCLE_REGISTER / 10) % 10);
      748:	2a b5       	in	r18, 0x2a	; 42
      74a:	3b b5       	in	r19, 0x2b	; 43
      74c:	ad ec       	ldi	r26, 0xCD	; 205
@@ -1058,7 +931,6 @@ void display_joystick_data(unsigned int x, unsigned int y)
      790:	c9 01       	movw	r24, r18
      792:	80 5d       	subi	r24, 0xD0	; 208
      794:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + SG90_INCLINE_DUTY_CYCLE_REGISTER % 10);
      798:	4a b5       	in	r20, 0x2a	; 42
      79a:	5b b5       	in	r21, 0x2b	; 43
      79c:	9a 01       	movw	r18, r20
@@ -1088,9 +960,6 @@ void display_joystick_data(unsigned int x, unsigned int y)
      7ce:	c9 01       	movw	r24, r18
      7d0:	80 5d       	subi	r24, 0xD0	; 208
      7d2:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	
-	
-}
      7d6:	df 91       	pop	r29
      7d8:	cf 91       	pop	r28
      7da:	1f 91       	pop	r17
@@ -1100,66 +969,45 @@ void display_joystick_data(unsigned int x, unsigned int y)
      7e2:	08 95       	ret
 
 000007e4 <display_monitoring_message>:
-
-void display_monitoring_message(void)
-{
-	hx_set_coordinates(0, 3);
      7e4:	63 e0       	ldi	r22, 0x03	; 3
      7e6:	80 e0       	ldi	r24, 0x00	; 0
      7e8:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("- system is in ");
      7ec:	8a e9       	ldi	r24, 0x9A	; 154
      7ee:	90 e0       	ldi	r25, 0x00	; 0
      7f0:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	hx_set_coordinates(0, 4);
      7f4:	64 e0       	ldi	r22, 0x04	; 4
      7f6:	80 e0       	ldi	r24, 0x00	; 0
      7f8:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("MONITORING mode");
      7fc:	8d ed       	ldi	r24, 0xDD	; 221
      7fe:	90 e0       	ldi	r25, 0x00	; 0
      800:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	
-	hx_set_coordinates(0, 6);
      804:	66 e0       	ldi	r22, 0x06	; 6
      806:	80 e0       	ldi	r24, 0x00	; 0
      808:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("Vbat:");
      80c:	8d ee       	ldi	r24, 0xED	; 237
      80e:	90 e0       	ldi	r25, 0x00	; 0
      810:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	hx_set_coordinates(80, 6);
      814:	66 e0       	ldi	r22, 0x06	; 6
      816:	80 e5       	ldi	r24, 0x50	; 80
      818:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("V");
      81c:	83 ef       	ldi	r24, 0xF3	; 243
      81e:	90 e0       	ldi	r25, 0x00	; 0
      820:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	
-	hx_set_coordinates(0, 7);
      824:	67 e0       	ldi	r22, 0x07	; 7
      826:	80 e0       	ldi	r24, 0x00	; 0
      828:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("Vchr:");
      82c:	85 ef       	ldi	r24, 0xF5	; 245
      82e:	90 e0       	ldi	r25, 0x00	; 0
      830:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
-	hx_set_coordinates(80, 7);
      834:	67 e0       	ldi	r22, 0x07	; 7
      836:	80 e5       	ldi	r24, 0x50	; 80
      838:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_string("V");
      83c:	83 ef       	ldi	r24, 0xF3	; 243
      83e:	90 e0       	ldi	r25, 0x00	; 0
      840:	0e 94 54 06 	call	0xca8	; 0xca8 <hx_write_string>
      844:	08 95       	ret
 
 00000846 <display_monitoring_data>:
-}
-
-void display_monitoring_data(unsigned int v_bat, unsigned int v_chr)
-{
      846:	ef 92       	push	r14
      848:	ff 92       	push	r15
      84a:	0f 93       	push	r16
@@ -1168,12 +1016,9 @@ void display_monitoring_data(unsigned int v_bat, unsigned int v_chr)
      850:	df 93       	push	r29
      852:	7c 01       	movw	r14, r24
      854:	8b 01       	movw	r16, r22
-	hx_set_coordinates(42, 6);
      856:	66 e0       	ldi	r22, 0x06	; 6
      858:	8a e2       	ldi	r24, 0x2A	; 42
      85a:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	
-	hx_write_char('0' + v_bat / 10000);
      85e:	97 01       	movw	r18, r14
      860:	32 95       	swap	r19
      862:	22 95       	swap	r18
@@ -1192,7 +1037,6 @@ void display_monitoring_data(unsigned int v_bat, unsigned int v_chr)
      87e:	87 95       	ror	r24
      880:	80 5d       	subi	r24, 0xD0	; 208
      882:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (v_bat / 1000) % 10);
      886:	97 01       	movw	r18, r14
      888:	36 95       	lsr	r19
      88a:	27 95       	ror	r18
@@ -1237,10 +1081,8 @@ void display_monitoring_data(unsigned int v_bat, unsigned int v_chr)
      8dc:	c9 01       	movw	r24, r18
      8de:	80 5d       	subi	r24, 0xD0	; 208
      8e0:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('.');
      8e4:	8e e2       	ldi	r24, 0x2E	; 46
      8e6:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (v_bat / 100) % 10);
      8ea:	97 01       	movw	r18, r14
      8ec:	36 95       	lsr	r19
      8ee:	27 95       	ror	r18
@@ -1279,7 +1121,6 @@ void display_monitoring_data(unsigned int v_bat, unsigned int v_chr)
      934:	c9 01       	movw	r24, r18
      936:	80 5d       	subi	r24, 0xD0	; 208
      938:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (v_bat / 10) % 10);
      93c:	97 01       	movw	r18, r14
      93e:	ad ec       	ldi	r26, 0xCD	; 205
      940:	bc ec       	ldi	r27, 0xCC	; 204
@@ -1316,7 +1157,6 @@ void display_monitoring_data(unsigned int v_bat, unsigned int v_chr)
      982:	c9 01       	movw	r24, r18
      984:	80 5d       	subi	r24, 0xD0	; 208
      986:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + v_bat % 10);
      98a:	ce 01       	movw	r24, r28
      98c:	88 0f       	add	r24, r24
      98e:	99 1f       	adc	r25, r25
@@ -1333,13 +1173,9 @@ void display_monitoring_data(unsigned int v_bat, unsigned int v_chr)
      9a4:	9d 0b       	sbc	r25, r29
      9a6:	80 5d       	subi	r24, 0xD0	; 208
      9a8:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	
-	hx_set_coordinates(42, 7);
      9ac:	67 e0       	ldi	r22, 0x07	; 7
      9ae:	8a e2       	ldi	r24, 0x2A	; 42
      9b0:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	
-	hx_write_char('0' + v_chr / 10000);
      9b4:	98 01       	movw	r18, r16
      9b6:	32 95       	swap	r19
      9b8:	22 95       	swap	r18
@@ -1358,7 +1194,6 @@ void display_monitoring_data(unsigned int v_bat, unsigned int v_chr)
      9d4:	87 95       	ror	r24
      9d6:	80 5d       	subi	r24, 0xD0	; 208
      9d8:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (v_chr / 1000) % 10);
      9dc:	98 01       	movw	r18, r16
      9de:	36 95       	lsr	r19
      9e0:	27 95       	ror	r18
@@ -1403,10 +1238,8 @@ void display_monitoring_data(unsigned int v_bat, unsigned int v_chr)
      a32:	c9 01       	movw	r24, r18
      a34:	80 5d       	subi	r24, 0xD0	; 208
      a36:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('.');
      a3a:	8e e2       	ldi	r24, 0x2E	; 46
      a3c:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (v_chr / 100) % 10);
      a40:	98 01       	movw	r18, r16
      a42:	36 95       	lsr	r19
      a44:	27 95       	ror	r18
@@ -1445,7 +1278,6 @@ void display_monitoring_data(unsigned int v_bat, unsigned int v_chr)
      a8a:	c9 01       	movw	r24, r18
      a8c:	80 5d       	subi	r24, 0xD0	; 208
      a8e:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + (v_chr / 10) % 10);
      a92:	98 01       	movw	r18, r16
      a94:	ad ec       	ldi	r26, 0xCD	; 205
      a96:	bc ec       	ldi	r27, 0xCC	; 204
@@ -1482,7 +1314,6 @@ void display_monitoring_data(unsigned int v_bat, unsigned int v_chr)
      ad8:	c9 01       	movw	r24, r18
      ada:	80 5d       	subi	r24, 0xD0	; 208
      adc:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + v_chr % 10);
      ae0:	ce 01       	movw	r24, r28
      ae2:	88 0f       	add	r24, r24
      ae4:	99 1f       	adc	r25, r25
@@ -1508,43 +1339,12 @@ void display_monitoring_data(unsigned int v_bat, unsigned int v_chr)
      b0e:	08 95       	ret
 
 00000b10 <hx_send_data>:
-}
-
-void hx_send_data(unsigned char _data)
-{
-	// activate hx1230
-	CLEAR_HX_CE;
      b10:	a9 98       	cbi	0x15, 1	; 21
-	#ifdef HX_DELAY_ENABLED
-	_delay_us(HX_DELAY_US);
-	#endif
-	
-	// configure communication for data transfer
-	SET_HX_DIN;
      b12:	ae 9a       	sbi	0x15, 6	; 21
-	#ifdef HX_DELAY_ENABLED
-	_delay_us(HX_DELAY_US);
-	#endif
-	
-	// toggle clock
-	SET_HX_CLK;
      b14:	af 9a       	sbi	0x15, 7	; 21
-	#ifdef HX_DELAY_ENABLED
-	_delay_us(HX_DELAY_US);
-	#endif
-	CLEAR_HX_CLK;
      b16:	af 98       	cbi	0x15, 7	; 21
-	#ifdef HX_DELAY_ENABLED
-	_delay_us(HX_DELAY_US);
-	#endif
-	
-	// send the actual data, MSB fiHX_RST
-	for(int bit_position = 7; bit_position >= 0; bit_position--)
      b18:	27 e0       	ldi	r18, 0x07	; 7
      b1a:	30 e0       	ldi	r19, 0x00	; 0
-	{
-		// calculate bit to be send
-		if(((_data >> bit_position) & 1) == 1)
      b1c:	90 e0       	ldi	r25, 0x00	; 0
      b1e:	ac 01       	movw	r20, r24
      b20:	02 2e       	mov	r0, r18
@@ -1555,82 +1355,24 @@ void hx_send_data(unsigned char _data)
      b2a:	e2 f7       	brpl	.-8      	; 0xb24 <hx_send_data+0x14>
      b2c:	40 ff       	sbrs	r20, 0
      b2e:	02 c0       	rjmp	.+4      	; 0xb34 <hx_send_data+0x24>
-		{
-			SET_HX_DIN;
      b30:	ae 9a       	sbi	0x15, 6	; 21
      b32:	01 c0       	rjmp	.+2      	; 0xb36 <hx_send_data+0x26>
-			_delay_us(HX_DELAY_US);
-			#endif
-		}
-		else
-		{
-			CLEAR_HX_DIN;
      b34:	ae 98       	cbi	0x15, 6	; 21
-			_delay_us(HX_DELAY_US);
-			#endif
-		}
-		
-		// toggle clock
-		SET_HX_CLK;
      b36:	af 9a       	sbi	0x15, 7	; 21
-		#ifdef HX_DELAY_ENABLED
-		_delay_us(HX_DELAY_US);
-		#endif
-		CLEAR_HX_CLK;
      b38:	af 98       	cbi	0x15, 7	; 21
-	#ifdef HX_DELAY_ENABLED
-	_delay_us(HX_DELAY_US);
-	#endif
-	
-	// send the actual data, MSB fiHX_RST
-	for(int bit_position = 7; bit_position >= 0; bit_position--)
      b3a:	21 50       	subi	r18, 0x01	; 1
      b3c:	31 09       	sbc	r19, r1
      b3e:	78 f7       	brcc	.-34     	; 0xb1e <hx_send_data+0xe>
-		_delay_us(HX_DELAY_US);
-		#endif
-	}
-	
-	// deactivate hx1230
-	SET_HX_CE;
      b40:	a9 9a       	sbi	0x15, 1	; 21
      b42:	08 95       	ret
 
 00000b44 <hx_send_command>:
-}
-
-void hx_send_command(unsigned char _command)
-{
-	// activate hx1230
-	CLEAR_HX_CE;
      b44:	a9 98       	cbi	0x15, 1	; 21
-	#ifdef HX_DELAY_ENABLED
-	_delay_us(HX_DELAY_US);
-	#endif
-	
-	// configure communication for command transfer
-	CLEAR_HX_DIN;
      b46:	ae 98       	cbi	0x15, 6	; 21
-	
-	// toggle clock
-	SET_HX_CLK;
      b48:	af 9a       	sbi	0x15, 7	; 21
-	#ifdef HX_DELAY_ENABLED
-	_delay_us(HX_DELAY_US);
-	#endif
-	CLEAR_HX_CLK;
      b4a:	af 98       	cbi	0x15, 7	; 21
-	#ifdef HX_DELAY_ENABLED
-	_delay_us(HX_DELAY_US);
-	#endif
-	
-	// send the actual command, MSB fiHX_RST
-	for(int bit_position = 7; bit_position >= 0; bit_position--)
      b4c:	27 e0       	ldi	r18, 0x07	; 7
      b4e:	30 e0       	ldi	r19, 0x00	; 0
-	{
-		// calculate bit to be send
-		if(((_command >> bit_position) & 1) == 1)
      b50:	90 e0       	ldi	r25, 0x00	; 0
      b52:	ac 01       	movw	r20, r24
      b54:	02 2e       	mov	r0, r18
@@ -1641,65 +1383,22 @@ void hx_send_command(unsigned char _command)
      b5e:	e2 f7       	brpl	.-8      	; 0xb58 <hx_send_command+0x14>
      b60:	40 ff       	sbrs	r20, 0
      b62:	02 c0       	rjmp	.+4      	; 0xb68 <hx_send_command+0x24>
-		{
-			SET_HX_DIN;
      b64:	ae 9a       	sbi	0x15, 6	; 21
      b66:	01 c0       	rjmp	.+2      	; 0xb6a <hx_send_command+0x26>
-			_delay_us(HX_DELAY_US);
-			#endif
-		}
-		else
-		{
-			CLEAR_HX_DIN;
      b68:	ae 98       	cbi	0x15, 6	; 21
-			_delay_us(HX_DELAY_US);
-			#endif
-		}
-		
-		// toggle clock
-		SET_HX_CLK;
      b6a:	af 9a       	sbi	0x15, 7	; 21
-		#ifdef HX_DELAY_ENABLED
-		_delay_us(HX_DELAY_US);
-		#endif
-		CLEAR_HX_CLK;
      b6c:	af 98       	cbi	0x15, 7	; 21
-	#ifdef HX_DELAY_ENABLED
-	_delay_us(HX_DELAY_US);
-	#endif
-	
-	// send the actual command, MSB fiHX_RST
-	for(int bit_position = 7; bit_position >= 0; bit_position--)
      b6e:	21 50       	subi	r18, 0x01	; 1
      b70:	31 09       	sbc	r19, r1
      b72:	78 f7       	brcc	.-34     	; 0xb52 <hx_send_command+0xe>
-		_delay_us(HX_DELAY_US);
-		#endif
-	}
-	
-	// deactivate hx1230
-	SET_HX_CE;
      b74:	a9 9a       	sbi	0x15, 1	; 21
      b76:	08 95       	ret
 
 00000b78 <init_hx1230_control>:
-
-
-void init_hx1230_control(void)
-{
-	// set required pins as output
-	HX1230_DDR |= ((1 << HX_RST) | (1 << HX_CE) | (1 << HX_DIN) | (1 << HX_CLK));
      b78:	84 b3       	in	r24, 0x14	; 20
      b7a:	83 6c       	ori	r24, 0xC3	; 195
      b7c:	84 bb       	out	0x14, r24	; 20
-	
-	// set idle state
-	CLEAR_HX_CLK;
      b7e:	af 98       	cbi	0x15, 7	; 21
-	#ifdef HX_DELAY_ENABLED
-	_delay_us(HX_DELAY_US);
-	#endif
-	CLEAR_HX_RST;
      b80:	a8 98       	cbi	0x15, 0	; 21
 	#else
 		//round up by default
@@ -1716,16 +1415,7 @@ void init_hx1230_control(void)
      b8e:	e1 f7       	brne	.-8      	; 0xb88 <init_hx1230_control+0x10>
      b90:	00 c0       	rjmp	.+0      	; 0xb92 <init_hx1230_control+0x1a>
      b92:	00 00       	nop
-	#ifdef HX_DELAY_ENABLED
-	_delay_us(HX_DELAY_US);
-	#endif
-	_delay_ms(50);
-	SET_HX_RST;
      b94:	a8 9a       	sbi	0x15, 0	; 21
-	#ifdef HX_DELAY_ENABLED
-	_delay_us(HX_DELAY_US);
-	#endif
-	CLEAR_HX_CE;
      b96:	a9 98       	cbi	0x15, 1	; 21
      b98:	8f ec       	ldi	r24, 0xCF	; 207
      b9a:	97 e0       	ldi	r25, 0x07	; 7
@@ -1733,11 +1423,6 @@ void init_hx1230_control(void)
      b9e:	f1 f7       	brne	.-4      	; 0xb9c <init_hx1230_control+0x24>
      ba0:	00 c0       	rjmp	.+0      	; 0xba2 <init_hx1230_control+0x2a>
      ba2:	00 00       	nop
-	#ifdef HX_DELAY_ENABLED
-	_delay_us(HX_DELAY_US);
-	#endif
-	_delay_ms(1);
-	SET_HX_CE;
      ba4:	a9 9a       	sbi	0x15, 1	; 21
      ba6:	8f ec       	ldi	r24, 0xCF	; 207
      ba8:	97 e0       	ldi	r25, 0x07	; 7
@@ -1745,187 +1430,85 @@ void init_hx1230_control(void)
      bac:	f1 f7       	brne	.-4      	; 0xbaa <init_hx1230_control+0x32>
      bae:	00 c0       	rjmp	.+0      	; 0xbb0 <init_hx1230_control+0x38>
      bb0:	00 00       	nop
-	_delay_ms(1);
-	
-	// commands needed to initialize hx1230 display
-	// found within a chinese data sheet
-	
-	hx_send_command(0x2f);
      bb2:	8f e2       	ldi	r24, 0x2F	; 47
      bb4:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
-	hx_send_command(0x90);
      bb8:	80 e9       	ldi	r24, 0x90	; 144
      bba:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
-	hx_send_command(0xa6);
      bbe:	86 ea       	ldi	r24, 0xA6	; 166
      bc0:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
-	hx_send_command(0xa4);
      bc4:	84 ea       	ldi	r24, 0xA4	; 164
      bc6:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
-	hx_send_command(0xaf);
      bca:	8f ea       	ldi	r24, 0xAF	; 175
      bcc:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
-	
-	hx_send_command(0x40);
      bd0:	80 e4       	ldi	r24, 0x40	; 64
      bd2:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
-	hx_send_command(0xb0);
      bd6:	80 eb       	ldi	r24, 0xB0	; 176
      bd8:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
-	hx_send_command(0x10);
      bdc:	80 e1       	ldi	r24, 0x10	; 16
      bde:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
-	hx_send_command(0x00);
      be2:	80 e0       	ldi	r24, 0x00	; 0
      be4:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
      be8:	08 95       	ret
 
 00000bea <hx_set_coordinates>:
-	// deactivate hx1230
-	SET_HX_CE;
-}
-
-void hx_set_coordinates(unsigned char _x, unsigned char _y)
-{
      bea:	cf 93       	push	r28
      bec:	c8 2f       	mov	r28, r24
-	// 0, 0 is the upper left corner
-	
-	hx_send_command(0xB0 + _y);
      bee:	80 eb       	ldi	r24, 0xB0	; 176
      bf0:	86 0f       	add	r24, r22
      bf2:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
-	hx_send_command(0x10 | ((_x & 0x7F) >> 4));
      bf6:	8c 2f       	mov	r24, r28
      bf8:	8f 77       	andi	r24, 0x7F	; 127
      bfa:	82 95       	swap	r24
      bfc:	8f 70       	andi	r24, 0x0F	; 15
      bfe:	80 61       	ori	r24, 0x10	; 16
      c00:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
-	hx_send_command(0x0F & _x);
      c04:	8c 2f       	mov	r24, r28
      c06:	8f 70       	andi	r24, 0x0F	; 15
      c08:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
-}
      c0c:	cf 91       	pop	r28
      c0e:	08 95       	ret
 
 00000c10 <hx_clear_screen>:
-
-void hx_clear_screen(void)
-{
      c10:	cf 93       	push	r28
      c12:	df 93       	push	r29
-	unsigned char col, row;
-	
-	hx_set_coordinates(0, 0);
      c14:	60 e0       	ldi	r22, 0x00	; 0
      c16:	80 e0       	ldi	r24, 0x00	; 0
      c18:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
      c1c:	d9 e0       	ldi	r29, 0x09	; 9
      c1e:	07 c0       	rjmp	.+14     	; 0xc2e <hx_clear_screen+0x1e>
-	
-	for(row = 0; row <= HX_MAX_ROW_ROOT; row ++)
-	{
-		for(col = 0; col <= HX_MAX_COL; col ++)
-		{
-			hx_send_data(0x00);
      c20:	80 e0       	ldi	r24, 0x00	; 0
      c22:	0e 94 88 05 	call	0xb10	; 0xb10 <hx_send_data>
      c26:	c1 50       	subi	r28, 0x01	; 1
-	
-	hx_set_coordinates(0, 0);
-	
-	for(row = 0; row <= HX_MAX_ROW_ROOT; row ++)
-	{
-		for(col = 0; col <= HX_MAX_COL; col ++)
      c28:	d9 f7       	brne	.-10     	; 0xc20 <hx_clear_screen+0x10>
      c2a:	d1 50       	subi	r29, 0x01	; 1
-{
-	unsigned char col, row;
-	
-	hx_set_coordinates(0, 0);
-	
-	for(row = 0; row <= HX_MAX_ROW_ROOT; row ++)
      c2c:	11 f0       	breq	.+4      	; 0xc32 <hx_clear_screen+0x22>
-	hx_send_command(0x10 | ((_x & 0x7F) >> 4));
-	hx_send_command(0x0F & _x);
-}
-
-void hx_clear_screen(void)
-{
      c2e:	c1 e6       	ldi	r28, 0x61	; 97
      c30:	f7 cf       	rjmp	.-18     	; 0xc20 <hx_clear_screen+0x10>
-		for(col = 0; col <= HX_MAX_COL; col ++)
-		{
-			hx_send_data(0x00);
-		}
-	}
-}
      c32:	df 91       	pop	r29
      c34:	cf 91       	pop	r28
      c36:	08 95       	ret
 
 00000c38 <hx_fill_screen>:
-
-void hx_fill_screen(void)
-{
      c38:	cf 93       	push	r28
      c3a:	df 93       	push	r29
-	unsigned char col, row;
-	
-	hx_set_coordinates(0, 0);
      c3c:	60 e0       	ldi	r22, 0x00	; 0
      c3e:	80 e0       	ldi	r24, 0x00	; 0
      c40:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
      c44:	d9 e0       	ldi	r29, 0x09	; 9
      c46:	07 c0       	rjmp	.+14     	; 0xc56 <hx_fill_screen+0x1e>
-	
-	for(row = 0; row < 9; row ++)
-	{
-		for(col = 0; col < 96; col ++)
-		{
-			hx_send_data(0xFF);
      c48:	8f ef       	ldi	r24, 0xFF	; 255
      c4a:	0e 94 88 05 	call	0xb10	; 0xb10 <hx_send_data>
      c4e:	c1 50       	subi	r28, 0x01	; 1
-	
-	hx_set_coordinates(0, 0);
-	
-	for(row = 0; row < 9; row ++)
-	{
-		for(col = 0; col < 96; col ++)
      c50:	d9 f7       	brne	.-10     	; 0xc48 <hx_fill_screen+0x10>
      c52:	d1 50       	subi	r29, 0x01	; 1
-{
-	unsigned char col, row;
-	
-	hx_set_coordinates(0, 0);
-	
-	for(row = 0; row < 9; row ++)
      c54:	11 f0       	breq	.+4      	; 0xc5a <hx_fill_screen+0x22>
-		}
-	}
-}
-
-void hx_fill_screen(void)
-{
      c56:	c0 e6       	ldi	r28, 0x60	; 96
      c58:	f7 cf       	rjmp	.-18     	; 0xc48 <hx_fill_screen+0x10>
-		for(col = 0; col < 96; col ++)
-		{
-			hx_send_data(0xFF);
-		}
-	}
-}
      c5a:	df 91       	pop	r29
      c5c:	cf 91       	pop	r28
      c5e:	08 95       	ret
 
 00000c60 <hx_write_char>:
-
-void hx_write_char(const unsigned char _character)
-{
      c60:	0f 93       	push	r16
      c62:	1f 93       	push	r17
      c64:	cf 93       	push	r28
@@ -1951,25 +1534,11 @@ void hx_write_char(const unsigned char _character)
      c8c:	11 1f       	adc	r17, r17
      c8e:	05 50       	subi	r16, 0x05	; 5
      c90:	1f 4f       	sbci	r17, 0xFF	; 255
-	
-	for(int row_index = 0; row_index < 6; row_index ++)
-	{
-		hx_send_data(HX_character[_character][row_index]);
      c92:	89 91       	ld	r24, Y+
      c94:	0e 94 88 05 	call	0xb10	; 0xb10 <hx_send_data>
-}
-
-void hx_write_char(const unsigned char _character)
-{
-	
-	for(int row_index = 0; row_index < 6; row_index ++)
      c98:	c0 17       	cp	r28, r16
      c9a:	d1 07       	cpc	r29, r17
      c9c:	d1 f7       	brne	.-12     	; 0xc92 <hx_write_char+0x32>
-	{
-		hx_send_data(HX_character[_character][row_index]);
-	}
-}
      c9e:	df 91       	pop	r29
      ca0:	cf 91       	pop	r28
      ca2:	1f 91       	pop	r17
@@ -1977,14 +1546,10 @@ void hx_write_char(const unsigned char _character)
      ca6:	08 95       	ret
 
 00000ca8 <hx_write_string>:
-
-void hx_write_string(const char *_characters_array)
-{
      ca8:	0f 93       	push	r16
      caa:	1f 93       	push	r17
      cac:	cf 93       	push	r28
      cae:	df 93       	push	r29
-	int string_length = strlen(_characters_array);
      cb0:	fc 01       	movw	r30, r24
      cb2:	01 90       	ld	r0, Z+
      cb4:	00 20       	and	r0, r0
@@ -1992,7 +1557,6 @@ void hx_write_string(const char *_characters_array)
      cb8:	31 97       	sbiw	r30, 0x01	; 1
      cba:	e8 1b       	sub	r30, r24
      cbc:	f9 0b       	sbc	r31, r25
-	for(int char_index = 0; char_index < string_length; char_index++)
      cbe:	1e 16       	cp	r1, r30
      cc0:	1f 06       	cpc	r1, r31
      cc2:	54 f4       	brge	.+20     	; 0xcd8 <hx_write_string+0x30>
@@ -2000,22 +1564,11 @@ void hx_write_string(const char *_characters_array)
      cc6:	8c 01       	movw	r16, r24
      cc8:	0e 0f       	add	r16, r30
      cca:	1f 1f       	adc	r17, r31
-	{
-		hx_write_char((const unsigned char)(_characters_array[char_index]));
      ccc:	89 91       	ld	r24, Y+
      cce:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-}
-
-void hx_write_string(const char *_characters_array)
-{
-	int string_length = strlen(_characters_array);
-	for(int char_index = 0; char_index < string_length; char_index++)
      cd2:	c0 17       	cp	r28, r16
      cd4:	d1 07       	cpc	r29, r17
      cd6:	d1 f7       	brne	.-12     	; 0xccc <hx_write_string+0x24>
-	{
-		hx_write_char((const unsigned char)(_characters_array[char_index]));
-	}
      cd8:	df 91       	pop	r29
      cda:	cf 91       	pop	r28
      cdc:	1f 91       	pop	r17
@@ -2023,79 +1576,44 @@ void hx_write_string(const char *_characters_array)
      ce0:	08 95       	ret
 
 00000ce2 <manual_control>:
-#include "sg90_driver.h"
-#include "unipolar_driver.h"
-#include "l293d.h"
-
-void manual_control(void)
-{
      ce2:	0f 93       	push	r16
      ce4:	1f 93       	push	r17
      ce6:	cf 93       	push	r28
      ce8:	df 93       	push	r29
-	unsigned int x = ADC_get_value(ADC_CHANNEL_X_AXIS);
      cea:	84 e0       	ldi	r24, 0x04	; 4
      cec:	0e 94 4f 00 	call	0x9e	; 0x9e <ADC_get_value>
      cf0:	ec 01       	movw	r28, r24
-	unsigned int y = ADC_get_value(ADC_CHANNEL_Y_AXIS);
      cf2:	85 e0       	ldi	r24, 0x05	; 5
      cf4:	0e 94 4f 00 	call	0x9e	; 0x9e <ADC_get_value>
      cf8:	8c 01       	movw	r16, r24
-	
-	display_joystick_data(x, y);
      cfa:	bc 01       	movw	r22, r24
      cfc:	ce 01       	movw	r24, r28
      cfe:	0e 94 dd 01 	call	0x3ba	; 0x3ba <display_joystick_data>
-	
-	if(y > (JOYSTICK_IDLE_VALUE + JOYSTICK_DEAD_ZONE))
      d02:	05 36       	cpi	r16, 0x65	; 101
      d04:	82 e0       	ldi	r24, 0x02	; 2
      d06:	18 07       	cpc	r17, r24
      d08:	28 f0       	brcs	.+10     	; 0xd14 <manual_control+0x32>
-	{
-		unipolar_01_step_backward(UNIPOLLAR_01_CURRENT_STEP);
      d0a:	80 91 fd 06 	lds	r24, 0x06FD	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
      d0e:	0e 94 98 09 	call	0x1330	; 0x1330 <unipolar_01_step_backward>
      d12:	0a c0       	rjmp	.+20     	; 0xd28 <manual_control+0x46>
-	}
-	else if(y < (JOYSTICK_IDLE_VALUE - JOYSTICK_DEAD_ZONE))
      d14:	0c 39       	cpi	r16, 0x9C	; 156
      d16:	11 40       	sbci	r17, 0x01	; 1
      d18:	28 f4       	brcc	.+10     	; 0xd24 <manual_control+0x42>
-	{
-		unipolar_01_step_forward(UNIPOLLAR_01_CURRENT_STEP);
      d1a:	80 91 fd 06 	lds	r24, 0x06FD	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
      d1e:	0e 94 67 09 	call	0x12ce	; 0x12ce <unipolar_01_step_forward>
      d22:	02 c0       	rjmp	.+4      	; 0xd28 <manual_control+0x46>
-	}
-	else
-	{
-		unipolar_01_clear_steps();
      d24:	0e 94 c9 09 	call	0x1392	; 0x1392 <unipolar_01_clear_steps>
-	}
-	
-	if(x > (JOYSTICK_IDLE_VALUE + JOYSTICK_DEAD_ZONE))
      d28:	c5 36       	cpi	r28, 0x65	; 101
      d2a:	82 e0       	ldi	r24, 0x02	; 2
      d2c:	d8 07       	cpc	r29, r24
      d2e:	18 f0       	brcs	.+6      	; 0xd36 <manual_control+0x54>
-	{
-		l293d_hb2_rotate_right();
      d30:	0e 94 bf 06 	call	0xd7e	; 0xd7e <l293d_hb2_rotate_right>
      d34:	08 c0       	rjmp	.+16     	; 0xd46 <manual_control+0x64>
-	}
-	else if(x < (JOYSTICK_IDLE_VALUE - JOYSTICK_DEAD_ZONE))
      d36:	cc 39       	cpi	r28, 0x9C	; 156
      d38:	d1 40       	sbci	r29, 0x01	; 1
      d3a:	18 f4       	brcc	.+6      	; 0xd42 <manual_control+0x60>
-	{
-		l293d_hb2_rotate_left();
      d3c:	0e 94 b5 06 	call	0xd6a	; 0xd6a <l293d_hb2_rotate_left>
      d40:	02 c0       	rjmp	.+4      	; 0xd46 <manual_control+0x64>
-	}
-	else
-	{
-		l293d_hb2_stop();
      d42:	0e 94 c9 06 	call	0xd92	; 0xd92 <l293d_hb2_stop>
      d46:	8f e4       	ldi	r24, 0x4F	; 79
      d48:	93 ec       	ldi	r25, 0xC3	; 195
@@ -2103,10 +1621,6 @@ void manual_control(void)
      d4c:	f1 f7       	brne	.-4      	; 0xd4a <manual_control+0x68>
      d4e:	00 c0       	rjmp	.+0      	; 0xd50 <manual_control+0x6e>
      d50:	00 00       	nop
-	}
-	
-	_delay_ms(25);
-}
      d52:	df 91       	pop	r29
      d54:	cf 91       	pop	r28
      d56:	1f 91       	pop	r17
@@ -2114,27 +1628,15 @@ void manual_control(void)
      d5a:	08 95       	ret
 
 00000d5c <init_l293d_control>:
-#include <util/delay.h>
-#include "l293d.h"
-
-void init_l293d_control(void)
-{
-	L293D_DDR |= ((1 << L293D_HB2_DIRECTION_LEFT) | (1 << L293D_HB2_DIRECTION_RIGHT) | (1 << L293D_HB2_ENABLE));
      d5c:	81 b3       	in	r24, 0x11	; 17
      d5e:	88 63       	ori	r24, 0x38	; 56
      d60:	81 bb       	out	0x11, r24	; 17
-	L293D_PORT &= ~((1 << L293D_HB2_DIRECTION_LEFT) | (1 << L293D_HB2_DIRECTION_RIGHT) | (1 << L293D_HB2_ENABLE));
      d62:	82 b3       	in	r24, 0x12	; 18
      d64:	87 7c       	andi	r24, 0xC7	; 199
      d66:	82 bb       	out	0x12, r24	; 18
      d68:	08 95       	ret
 
 00000d6a <l293d_hb2_rotate_left>:
-}
-
-void l293d_hb2_rotate_left(void)
-{
-	L293D_CLEAR_HB2_DIRECTION_RIGHT;
      d6a:	94 98       	cbi	0x12, 4	; 18
      d6c:	8f ec       	ldi	r24, 0xCF	; 207
      d6e:	97 e0       	ldi	r25, 0x07	; 7
@@ -2142,19 +1644,11 @@ void l293d_hb2_rotate_left(void)
      d72:	f1 f7       	brne	.-4      	; 0xd70 <l293d_hb2_rotate_left+0x6>
      d74:	00 c0       	rjmp	.+0      	; 0xd76 <l293d_hb2_rotate_left+0xc>
      d76:	00 00       	nop
-	_delay_ms(L293D_DEAD_TIME_MS);
-	L293D_SET_HB2_DIRECTION_LEFT;
      d78:	93 9a       	sbi	0x12, 3	; 18
-	L293D_SET_HB2_ENABLE;
      d7a:	95 9a       	sbi	0x12, 5	; 18
      d7c:	08 95       	ret
 
 00000d7e <l293d_hb2_rotate_right>:
-}
-
-void l293d_hb2_rotate_right(void)
-{
-	L293D_CLEAR_HB2_DIRECTION_LEFT;
      d7e:	93 98       	cbi	0x12, 3	; 18
      d80:	8f ec       	ldi	r24, 0xCF	; 207
      d82:	97 e0       	ldi	r25, 0x07	; 7
@@ -2162,63 +1656,31 @@ void l293d_hb2_rotate_right(void)
      d86:	f1 f7       	brne	.-4      	; 0xd84 <l293d_hb2_rotate_right+0x6>
      d88:	00 c0       	rjmp	.+0      	; 0xd8a <l293d_hb2_rotate_right+0xc>
      d8a:	00 00       	nop
-	_delay_ms(L293D_DEAD_TIME_MS);
-	L293D_SET_HB2_DIRECTION_RIGHT;
      d8c:	94 9a       	sbi	0x12, 4	; 18
-	L293D_SET_HB2_ENABLE;
      d8e:	95 9a       	sbi	0x12, 5	; 18
      d90:	08 95       	ret
 
 00000d92 <l293d_hb2_stop>:
-}
-
-void l293d_hb2_stop(void)
-{
-	L293D_CLEAR_HB2_ENABLE;
      d92:	95 98       	cbi	0x12, 5	; 18
-	L293D_CLEAR_HB2_DIRECTION_LEFT;
      d94:	93 98       	cbi	0x12, 3	; 18
-	L293D_CLEAR_HB2_DIRECTION_RIGHT;
      d96:	94 98       	cbi	0x12, 4	; 18
      d98:	08 95       	ret
 
 00000d9a <get_filtered_light_intensity>:
-	adc_value = percentage_value(adc_value);
-	return adc_value;
-}
-
-int get_filtered_light_intensity(uint8_t sensor)
-{
      d9a:	0f 93       	push	r16
      d9c:	1f 93       	push	r17
      d9e:	cf 93       	push	r28
      da0:	df 93       	push	r29
      da2:	d8 2f       	mov	r29, r24
      da4:	cf e0       	ldi	r28, 0x0F	; 15
-	uint16_t adc_value = 0;
      da6:	00 e0       	ldi	r16, 0x00	; 0
      da8:	10 e0       	ldi	r17, 0x00	; 0
-	for(char i = 0; i < FILTLER_RANK; i++)
-	{
-		adc_value += ADC_get_value(sensor);
      daa:	8d 2f       	mov	r24, r29
      dac:	0e 94 4f 00 	call	0x9e	; 0x9e <ADC_get_value>
      db0:	08 0f       	add	r16, r24
      db2:	19 1f       	adc	r17, r25
      db4:	c1 50       	subi	r28, 0x01	; 1
-}
-
-int get_filtered_light_intensity(uint8_t sensor)
-{
-	uint16_t adc_value = 0;
-	for(char i = 0; i < FILTLER_RANK; i++)
      db6:	c9 f7       	brne	.-14     	; 0xdaa <get_filtered_light_intensity+0x10>
-	return adc_value;
-}
-
-int percentage_value(int raw_value)
-{
-	raw_value = raw_value*((long)100)/1023;
      db8:	98 01       	movw	r18, r16
      dba:	a9 e8       	ldi	r26, 0x89	; 137
      dbc:	b8 e8       	ldi	r27, 0x88	; 136
@@ -2238,12 +1700,6 @@ int percentage_value(int raw_value)
      ddc:	40 e0       	ldi	r20, 0x00	; 0
      dde:	50 e0       	ldi	r21, 0x00	; 0
      de0:	0e 94 1b 0a 	call	0x1436	; 0x1436 <__divmodsi4>
-		adc_value += ADC_get_value(sensor);
-	}
-	adc_value /= FILTLER_RANK;
-	adc_value = percentage_value(adc_value);
-	return adc_value;
-}
      de4:	84 e6       	ldi	r24, 0x64	; 100
      de6:	90 e0       	ldi	r25, 0x00	; 0
      de8:	82 1b       	sub	r24, r18
@@ -2264,12 +1720,6 @@ int percentage_value(int raw_value)
      e02:	e1 f7       	brne	.-8      	; 0xdfc <uC_init+0x6>
      e04:	00 c0       	rjmp	.+0      	; 0xe06 <uC_init+0x10>
      e06:	00 00       	nop
-{
-	// Wait for system to get fully powered up
-	_delay_ms(100);
-	
-	// initialize required modules
-	ADC_init();
      e08:	0e 94 49 00 	call	0x92	; 0x92 <ADC_init>
      e0c:	2f e7       	ldi	r18, 0x7F	; 127
      e0e:	88 e3       	ldi	r24, 0x38	; 56
@@ -2280,9 +1730,6 @@ int percentage_value(int raw_value)
      e18:	e1 f7       	brne	.-8      	; 0xe12 <uC_init+0x1c>
      e1a:	00 c0       	rjmp	.+0      	; 0xe1c <uC_init+0x26>
      e1c:	00 00       	nop
-	_delay_ms(50);
-	
-	init_user_interface();
      e1e:	0e 94 d7 09 	call	0x13ae	; 0x13ae <init_user_interface>
      e22:	2f e7       	ldi	r18, 0x7F	; 127
      e24:	88 e3       	ldi	r24, 0x38	; 56
@@ -2293,9 +1740,6 @@ int percentage_value(int raw_value)
      e2e:	e1 f7       	brne	.-8      	; 0xe28 <uC_init+0x32>
      e30:	00 c0       	rjmp	.+0      	; 0xe32 <uC_init+0x3c>
      e32:	00 00       	nop
-	_delay_ms(50);
-	
-	init_unipolar_control();
      e34:	0e 94 5c 09 	call	0x12b8	; 0x12b8 <init_unipolar_control>
      e38:	2f e7       	ldi	r18, 0x7F	; 127
      e3a:	88 e3       	ldi	r24, 0x38	; 56
@@ -2306,9 +1750,6 @@ int percentage_value(int raw_value)
      e44:	e1 f7       	brne	.-8      	; 0xe3e <uC_init+0x48>
      e46:	00 c0       	rjmp	.+0      	; 0xe48 <uC_init+0x52>
      e48:	00 00       	nop
-	_delay_ms(50);
-	
-	init_l293d_control();
      e4a:	0e 94 ae 06 	call	0xd5c	; 0xd5c <init_l293d_control>
      e4e:	2f e7       	ldi	r18, 0x7F	; 127
      e50:	88 e3       	ldi	r24, 0x38	; 56
@@ -2319,9 +1760,6 @@ int percentage_value(int raw_value)
      e5a:	e1 f7       	brne	.-8      	; 0xe54 <uC_init+0x5e>
      e5c:	00 c0       	rjmp	.+0      	; 0xe5e <uC_init+0x68>
      e5e:	00 00       	nop
-	_delay_ms(50);
-	
-	init_hx1230_control();
      e60:	0e 94 bc 05 	call	0xb78	; 0xb78 <init_hx1230_control>
      e64:	2f e7       	ldi	r18, 0x7F	; 127
      e66:	88 e3       	ldi	r24, 0x38	; 56
@@ -2332,8 +1770,6 @@ int percentage_value(int raw_value)
      e70:	e1 f7       	brne	.-8      	; 0xe6a <uC_init+0x74>
      e72:	00 c0       	rjmp	.+0      	; 0xe74 <uC_init+0x7e>
      e74:	00 00       	nop
-	_delay_ms(50);
-	hx_fill_screen();
      e76:	0e 94 1c 06 	call	0xc38	; 0xc38 <hx_fill_screen>
      e7a:	2f ef       	ldi	r18, 0xFF	; 255
      e7c:	84 e3       	ldi	r24, 0x34	; 52
@@ -2344,8 +1780,6 @@ int percentage_value(int raw_value)
      e86:	e1 f7       	brne	.-8      	; 0xe80 <uC_init+0x8a>
      e88:	00 c0       	rjmp	.+0      	; 0xe8a <uC_init+0x94>
      e8a:	00 00       	nop
-	_delay_ms(500);
-	hx_clear_screen();
      e8c:	0e 94 08 06 	call	0xc10	; 0xc10 <hx_clear_screen>
      e90:	2f e7       	ldi	r18, 0x7F	; 127
      e92:	88 e3       	ldi	r24, 0x38	; 56
@@ -2356,45 +1790,22 @@ int percentage_value(int raw_value)
      e9c:	e1 f7       	brne	.-8      	; 0xe96 <uC_init+0xa0>
      e9e:	00 c0       	rjmp	.+0      	; 0xea0 <uC_init+0xaa>
      ea0:	00 00       	nop
-	_delay_ms(50);
-	
-	display_title();
      ea2:	0e 94 92 00 	call	0x124	; 0x124 <display_title>
-	display_idle_state_message();
      ea6:	0e 94 93 01 	call	0x326	; 0x326 <display_idle_state_message>
-	
-	sei(); // enable global interrupts
      eaa:	78 94       	sei
      eac:	08 95       	ret
 
 00000eae <main>:
-
-void uC_init(void);
-
-int main(void)
-{
-	STATE = STATE_INIT;
      eae:	10 92 fe 06 	sts	0x06FE, r1	; 0x8006fe <STATE>
-	OLD_STATE = STATE_INIT;
      eb2:	10 92 fc 06 	sts	0x06FC, r1	; 0x8006fc <__data_end>
-	uC_init();
      eb6:	0e 94 fb 06 	call	0xdf6	; 0xdf6 <uC_init>
-	
-	STATE = STATE_IDLE;
      eba:	81 e0       	ldi	r24, 0x01	; 1
      ebc:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
-	
-	while (1)
-	{
-		if(STATE_CHANGED)
      ec0:	80 91 fe 06 	lds	r24, 0x06FE	; 0x8006fe <STATE>
      ec4:	90 91 fc 06 	lds	r25, 0x06FC	; 0x8006fc <__data_end>
      ec8:	98 17       	cp	r25, r24
      eca:	71 f0       	breq	.+28     	; 0xee8 <main+0x3a>
-		{
-			OLD_STATE = STATE; // update state
      ecc:	80 93 fc 06 	sts	0x06FC, r24	; 0x8006fc <__data_end>
-			go_to_state(STATE);
      ed0:	0e 94 fc 07 	call	0xff8	; 0xff8 <go_to_state>
      ed4:	2f e7       	ldi	r18, 0x7F	; 127
      ed6:	8a e1       	ldi	r24, 0x1A	; 26
@@ -2405,12 +1816,7 @@ int main(void)
      ee0:	e1 f7       	brne	.-8      	; 0xeda <main+0x2c>
      ee2:	00 c0       	rjmp	.+0      	; 0xee4 <main+0x36>
      ee4:	00 00       	nop
-			_delay_ms(250);
-			sei(); // enable interrupts
      ee6:	78 94       	sei
-		}
-		
-		switch(OLD_STATE)
      ee8:	80 91 fc 06 	lds	r24, 0x06FC	; 0x8006fc <__data_end>
      eec:	83 30       	cpi	r24, 0x03	; 3
      eee:	29 f0       	breq	.+10     	; 0xefa <main+0x4c>
@@ -2419,26 +1825,11 @@ int main(void)
      ef4:	82 30       	cpi	r24, 0x02	; 2
      ef6:	21 f7       	brne	.-56     	; 0xec0 <main+0x12>
      ef8:	03 c0       	rjmp	.+6      	; 0xf00 <main+0x52>
-		{
-			case STATE_TRACKING:
-			{
-				track();
      efa:	0e 94 28 08 	call	0x1050	; 0x1050 <track>
-				break;
      efe:	e0 cf       	rjmp	.-64     	; 0xec0 <main+0x12>
-			}
-			case STATE_MANUAL:
-			{
-				manual_control();
      f00:	0e 94 71 06 	call	0xce2	; 0xce2 <manual_control>
-				break;
      f04:	dd cf       	rjmp	.-70     	; 0xec0 <main+0x12>
-			}
-			case STATE_MONITORING:
-			{
-				monitor();
      f06:	0e 94 86 07 	call	0xf0c	; 0xf0c <monitor>
-				break;
      f0a:	da cf       	rjmp	.-76     	; 0xec0 <main+0x12>
 
 00000f0c <monitor>:
@@ -2475,64 +1866,28 @@ void monitor(void)
      f38:	08 95       	ret
 
 00000f3a <stand_rotate_left>:
-
-void stand_rotate_left(void)
-{
-	if(ROTATE_LEFT_ALLOWED)
-	{
-		l293d_hb2_rotate_left();
      f3a:	0e 94 b5 06 	call	0xd6a	; 0xd6a <l293d_hb2_rotate_left>
      f3e:	08 95       	ret
 
 00000f40 <stand_rotate_right>:
-
-void stand_rotate_right(void)
-{
-	if(ROTATE_RIGHT_ALLOWED)
-	{
-		l293d_hb2_rotate_right();
      f40:	0e 94 bf 06 	call	0xd7e	; 0xd7e <l293d_hb2_rotate_right>
      f44:	08 95       	ret
 
 00000f46 <stand_stop_rotation>:
-	}
-}
-
-void stand_stop_rotation(void)
-{
-	l293d_hb2_stop();
      f46:	0e 94 c9 06 	call	0xd92	; 0xd92 <l293d_hb2_stop>
      f4a:	08 95       	ret
 
 00000f4c <stand_incline_down>:
-
-void stand_incline_down(void)
-{
-	if(INCLINE_DOWN_ALLOWED)
-	{
-		unipolar_01_step_backward(UNIPOLLAR_01_CURRENT_STEP);
      f4c:	80 91 fd 06 	lds	r24, 0x06FD	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
      f50:	0e 94 98 09 	call	0x1330	; 0x1330 <unipolar_01_step_backward>
      f54:	08 95       	ret
 
 00000f56 <stand_incline_up>:
-
-void stand_incline_up(void)
-{
-	if(INCLINE_UP_ALLOWED)
-	{
-		unipolar_01_step_forward(UNIPOLLAR_01_CURRENT_STEP);
      f56:	80 91 fd 06 	lds	r24, 0x06FD	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
      f5a:	0e 94 67 09 	call	0x12ce	; 0x12ce <unipolar_01_step_forward>
      f5e:	08 95       	ret
 
 00000f60 <stand_stop_incline>:
-	}
-}
-
-void stand_stop_incline(void)
-{
-	unipolar_01_clear_steps();
      f60:	0e 94 c9 09 	call	0x1392	; 0x1392 <unipolar_01_clear_steps>
      f64:	08 95       	ret
 
@@ -2546,16 +1901,8 @@ void stand_stop_incline(void)
      f72:	e1 f7       	brne	.-8      	; 0xf6c <idle_state_setup+0x6>
      f74:	00 c0       	rjmp	.+0      	; 0xf76 <idle_state_setup+0x10>
      f76:	00 00       	nop
-}
-
-void idle_state_setup(void)
-{
-	_delay_ms(200);
-	hx_clear_screen();
      f78:	0e 94 08 06 	call	0xc10	; 0xc10 <hx_clear_screen>
-	display_title();
      f7c:	0e 94 92 00 	call	0x124	; 0x124 <display_title>
-	display_idle_state_message();
      f80:	0e 94 93 01 	call	0x326	; 0x326 <display_idle_state_message>
      f84:	08 95       	ret
 
@@ -2569,16 +1916,8 @@ void idle_state_setup(void)
      f92:	e1 f7       	brne	.-8      	; 0xf8c <manual_state_setup+0x6>
      f94:	00 c0       	rjmp	.+0      	; 0xf96 <manual_state_setup+0x10>
      f96:	00 00       	nop
-}
-
-void manual_state_setup(void)
-{
-	_delay_ms(200);
-	hx_clear_screen();
      f98:	0e 94 08 06 	call	0xc10	; 0xc10 <hx_clear_screen>
-	display_title();
      f9c:	0e 94 92 00 	call	0x124	; 0x124 <display_title>
-	display_manual_state_message();
      fa0:	0e 94 ac 01 	call	0x358	; 0x358 <display_manual_state_message>
      fa4:	08 95       	ret
 
@@ -2592,16 +1931,8 @@ void manual_state_setup(void)
      fb2:	e1 f7       	brne	.-8      	; 0xfac <tracking_state_setup+0x6>
      fb4:	00 c0       	rjmp	.+0      	; 0xfb6 <tracking_state_setup+0x10>
      fb6:	00 00       	nop
-}
-
-void tracking_state_setup(void)
-{
-	_delay_ms(200);
-	hx_clear_screen();
      fb8:	0e 94 08 06 	call	0xc10	; 0xc10 <hx_clear_screen>
-	display_title();
      fbc:	0e 94 92 00 	call	0x124	; 0x124 <display_title>
-	display_data_menu();
      fc0:	0e 94 a3 00 	call	0x146	; 0x146 <display_data_menu>
      fc4:	2f ef       	ldi	r18, 0xFF	; 255
      fc6:	84 e3       	ldi	r24, 0x34	; 52
@@ -2624,36 +1955,17 @@ void tracking_state_setup(void)
      fe4:	e1 f7       	brne	.-8      	; 0xfde <monitoring_state_setup+0x6>
      fe6:	00 c0       	rjmp	.+0      	; 0xfe8 <monitoring_state_setup+0x10>
      fe8:	00 00       	nop
-}
-
-void monitoring_state_setup(void)
-{
-	_delay_ms(200);
-	hx_clear_screen();
      fea:	0e 94 08 06 	call	0xc10	; 0xc10 <hx_clear_screen>
-	display_title();
      fee:	0e 94 92 00 	call	0x124	; 0x124 <display_title>
-	display_monitoring_message();
      ff2:	0e 94 f2 03 	call	0x7e4	; 0x7e4 <display_monitoring_message>
      ff6:	08 95       	ret
 
 00000ff8 <go_to_state>:
-#include "hx1230.h"
-#include "unipolar_driver.h"
-#include "l293d.h"
-
-void go_to_state(unsigned char state)
-{
      ff8:	cf 93       	push	r28
      ffa:	c8 2f       	mov	r28, r24
-	l293d_hb2_stop();  /* make sure motor control is turned off when changing states */
      ffc:	0e 94 c9 06 	call	0xd92	; 0xd92 <l293d_hb2_stop>
-	unipolar_01_clear_steps();  /* make sure motor control is turned off when changing states */
     1000:	0e 94 c9 09 	call	0x1392	; 0x1392 <unipolar_01_clear_steps>
-	
-	hx_clear_screen();
     1004:	0e 94 08 06 	call	0xc10	; 0xc10 <hx_clear_screen>
-	switch(state)
     1008:	c2 30       	cpi	r28, 0x02	; 2
     100a:	79 f0       	breq	.+30     	; 0x102a <go_to_state+0x32>
     100c:	18 f4       	brcc	.+6      	; 0x1014 <go_to_state+0x1c>
@@ -2665,108 +1977,63 @@ void go_to_state(unsigned char state)
     1018:	c4 30       	cpi	r28, 0x04	; 4
     101a:	99 f0       	breq	.+38     	; 0x1042 <go_to_state+0x4a>
     101c:	17 c0       	rjmp	.+46     	; 0x104c <go_to_state+0x54>
-	{
-		case STATE_IDLE:
-		{
-			STATE = STATE_IDLE; // update global state
     101e:	81 e0       	ldi	r24, 0x01	; 1
     1020:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
-			idle_state_setup();
     1024:	0e 94 b3 07 	call	0xf66	; 0xf66 <idle_state_setup>
-			break;
     1028:	11 c0       	rjmp	.+34     	; 0x104c <go_to_state+0x54>
-		}
-		case STATE_MANUAL:
-		{
-			STATE = STATE_MANUAL; // update global state
     102a:	82 e0       	ldi	r24, 0x02	; 2
     102c:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
-			manual_state_setup();
     1030:	0e 94 c3 07 	call	0xf86	; 0xf86 <manual_state_setup>
-			break;
     1034:	0b c0       	rjmp	.+22     	; 0x104c <go_to_state+0x54>
-		}
-		case STATE_TRACKING:
-		{
-			STATE = STATE_TRACKING; // update global state
     1036:	83 e0       	ldi	r24, 0x03	; 3
     1038:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
-			tracking_state_setup();
     103c:	0e 94 d3 07 	call	0xfa6	; 0xfa6 <tracking_state_setup>
-			break;
     1040:	05 c0       	rjmp	.+10     	; 0x104c <go_to_state+0x54>
-		}
-		case STATE_MONITORING:
-		{
-			STATE = STATE_MONITORING; // update global state
     1042:	84 e0       	ldi	r24, 0x04	; 4
     1044:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
-			monitoring_state_setup();
     1048:	0e 94 ec 07 	call	0xfd8	; 0xfd8 <monitoring_state_setup>
-			break;
-		}
-	}
-}
     104c:	cf 91       	pop	r28
     104e:	08 95       	ret
 
 00001050 <track>:
-
-int up_down_movement_gradient_request;
-int left_right_movement_gradient_request;
-
-void track(void)
-{
     1050:	cf 93       	push	r28
     1052:	df 93       	push	r29
-	light_up_left = get_filtered_light_intensity(LS_UP_LEFT);
     1054:	80 e0       	ldi	r24, 0x00	; 0
     1056:	0e 94 cd 06 	call	0xd9a	; 0xd9a <get_filtered_light_intensity>
     105a:	90 93 12 07 	sts	0x0712, r25	; 0x800712 <light_up_left+0x1>
     105e:	80 93 11 07 	sts	0x0711, r24	; 0x800711 <light_up_left>
-	light_up_right = get_filtered_light_intensity(LS_UP_RIGHT);
     1062:	81 e0       	ldi	r24, 0x01	; 1
     1064:	0e 94 cd 06 	call	0xd9a	; 0xd9a <get_filtered_light_intensity>
     1068:	90 93 04 07 	sts	0x0704, r25	; 0x800704 <light_up_right+0x1>
     106c:	80 93 03 07 	sts	0x0703, r24	; 0x800703 <light_up_right>
-	light_down_left = get_filtered_light_intensity(LS_DOWN_LEFT);
     1070:	82 e0       	ldi	r24, 0x02	; 2
     1072:	0e 94 cd 06 	call	0xd9a	; 0xd9a <get_filtered_light_intensity>
     1076:	90 93 0e 07 	sts	0x070E, r25	; 0x80070e <light_down_left+0x1>
     107a:	80 93 0d 07 	sts	0x070D, r24	; 0x80070d <light_down_left>
-	light_down_right = get_filtered_light_intensity(LS_DOWN_RIGHT);
     107e:	83 e0       	ldi	r24, 0x03	; 3
     1080:	0e 94 cd 06 	call	0xd9a	; 0xd9a <get_filtered_light_intensity>
     1084:	90 93 06 07 	sts	0x0706, r25	; 0x800706 <light_down_right+0x1>
     1088:	80 93 05 07 	sts	0x0705, r24	; 0x800705 <light_down_right>
-	
-	display_light_sensor_data(LS_UP_LEFT, light_up_left);
     108c:	60 91 11 07 	lds	r22, 0x0711	; 0x800711 <light_up_left>
     1090:	70 91 12 07 	lds	r23, 0x0712	; 0x800712 <light_up_left+0x1>
     1094:	80 e0       	ldi	r24, 0x00	; 0
     1096:	0e 94 bc 00 	call	0x178	; 0x178 <display_light_sensor_data>
-	display_light_sensor_data(LS_UP_RIGHT, light_up_right);
     109a:	60 91 03 07 	lds	r22, 0x0703	; 0x800703 <light_up_right>
     109e:	70 91 04 07 	lds	r23, 0x0704	; 0x800704 <light_up_right+0x1>
     10a2:	81 e0       	ldi	r24, 0x01	; 1
     10a4:	0e 94 bc 00 	call	0x178	; 0x178 <display_light_sensor_data>
-	display_light_sensor_data(LS_DOWN_LEFT, light_down_left);
     10a8:	60 91 0d 07 	lds	r22, 0x070D	; 0x80070d <light_down_left>
     10ac:	70 91 0e 07 	lds	r23, 0x070E	; 0x80070e <light_down_left+0x1>
     10b0:	82 e0       	ldi	r24, 0x02	; 2
     10b2:	0e 94 bc 00 	call	0x178	; 0x178 <display_light_sensor_data>
-	display_light_sensor_data(LS_DOWN_RIGHT, light_down_right);
     10b6:	60 91 05 07 	lds	r22, 0x0705	; 0x800705 <light_down_right>
     10ba:	70 91 06 07 	lds	r23, 0x0706	; 0x800706 <light_down_right+0x1>
     10be:	83 e0       	ldi	r24, 0x03	; 3
     10c0:	0e 94 bc 00 	call	0x178	; 0x178 <display_light_sensor_data>
-	
-	up_intensity_average = light_up_left + light_up_right;
     10c4:	e0 91 11 07 	lds	r30, 0x0711	; 0x800711 <light_up_left>
     10c8:	f0 91 12 07 	lds	r31, 0x0712	; 0x800712 <light_up_left+0x1>
     10cc:	60 91 03 07 	lds	r22, 0x0703	; 0x800703 <light_up_right>
     10d0:	70 91 04 07 	lds	r23, 0x0704	; 0x800704 <light_up_right+0x1>
-	up_intensity_average >>= 1;
     10d4:	af 01       	movw	r20, r30
     10d6:	46 0f       	add	r20, r22
     10d8:	57 1f       	adc	r21, r23
@@ -2774,13 +2041,10 @@ void track(void)
     10dc:	47 95       	ror	r20
     10de:	50 93 10 07 	sts	0x0710, r21	; 0x800710 <up_intensity_average+0x1>
     10e2:	40 93 0f 07 	sts	0x070F, r20	; 0x80070f <up_intensity_average>
-	
-	down_intensity_average = light_down_left + light_down_right;
     10e6:	20 91 0d 07 	lds	r18, 0x070D	; 0x80070d <light_down_left>
     10ea:	30 91 0e 07 	lds	r19, 0x070E	; 0x80070e <light_down_left+0x1>
     10ee:	80 91 05 07 	lds	r24, 0x0705	; 0x800705 <light_down_right>
     10f2:	90 91 06 07 	lds	r25, 0x0706	; 0x800706 <light_down_right+0x1>
-	down_intensity_average >>= 1;
     10f6:	a9 01       	movw	r20, r18
     10f8:	48 0f       	add	r20, r24
     10fa:	59 1f       	adc	r21, r25
@@ -2788,30 +2052,21 @@ void track(void)
     10fe:	47 95       	ror	r20
     1100:	50 93 00 07 	sts	0x0700, r21	; 0x800700 <down_intensity_average+0x1>
     1104:	40 93 ff 06 	sts	0x06FF, r20	; 0x8006ff <down_intensity_average>
-	
-	left_intensity_average = light_up_left + light_down_left;
-	left_intensity_average >>= 1;
     1108:	2e 0f       	add	r18, r30
     110a:	3f 1f       	adc	r19, r31
     110c:	35 95       	asr	r19
     110e:	27 95       	ror	r18
     1110:	30 93 02 07 	sts	0x0702, r19	; 0x800702 <left_intensity_average+0x1>
     1114:	20 93 01 07 	sts	0x0701, r18	; 0x800701 <left_intensity_average>
-	
-	right_intensity_average = light_up_right + light_down_right;
-	right_intensity_average >>= 1;
     1118:	86 0f       	add	r24, r22
     111a:	97 1f       	adc	r25, r23
     111c:	95 95       	asr	r25
     111e:	87 95       	ror	r24
     1120:	90 93 0c 07 	sts	0x070C, r25	; 0x80070c <right_intensity_average+0x1>
     1124:	80 93 0b 07 	sts	0x070B, r24	; 0x80070b <right_intensity_average>
-	
-	hx_set_coordinates(42, 2);
     1128:	62 e0       	ldi	r22, 0x02	; 2
     112a:	8a e2       	ldi	r24, 0x2A	; 42
     112c:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_char('0' + (up_intensity_average / 10) % 10);
     1130:	80 91 0f 07 	lds	r24, 0x070F	; 0x80070f <up_intensity_average>
     1134:	90 91 10 07 	lds	r25, 0x0710	; 0x800710 <up_intensity_average+0x1>
     1138:	ca e0       	ldi	r28, 0x0A	; 10
@@ -2823,19 +2078,15 @@ void track(void)
     1146:	0e 94 07 0a 	call	0x140e	; 0x140e <__divmodhi4>
     114a:	80 5d       	subi	r24, 0xD0	; 208
     114c:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + up_intensity_average % 10);
     1150:	80 91 0f 07 	lds	r24, 0x070F	; 0x80070f <up_intensity_average>
     1154:	90 91 10 07 	lds	r25, 0x0710	; 0x800710 <up_intensity_average+0x1>
     1158:	be 01       	movw	r22, r28
     115a:	0e 94 07 0a 	call	0x140e	; 0x140e <__divmodhi4>
     115e:	80 5d       	subi	r24, 0xD0	; 208
     1160:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	
-	hx_set_coordinates(42, 6);
     1164:	66 e0       	ldi	r22, 0x06	; 6
     1166:	8a e2       	ldi	r24, 0x2A	; 42
     1168:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_char('0' + (down_intensity_average / 10) % 10);
     116c:	80 91 ff 06 	lds	r24, 0x06FF	; 0x8006ff <down_intensity_average>
     1170:	90 91 00 07 	lds	r25, 0x0700	; 0x800700 <down_intensity_average+0x1>
     1174:	be 01       	movw	r22, r28
@@ -2845,19 +2096,15 @@ void track(void)
     117e:	0e 94 07 0a 	call	0x140e	; 0x140e <__divmodhi4>
     1182:	80 5d       	subi	r24, 0xD0	; 208
     1184:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + down_intensity_average % 10);
     1188:	80 91 ff 06 	lds	r24, 0x06FF	; 0x8006ff <down_intensity_average>
     118c:	90 91 00 07 	lds	r25, 0x0700	; 0x800700 <down_intensity_average+0x1>
     1190:	be 01       	movw	r22, r28
     1192:	0e 94 07 0a 	call	0x140e	; 0x140e <__divmodhi4>
     1196:	80 5d       	subi	r24, 0xD0	; 208
     1198:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	
-	hx_set_coordinates(6, 4);
     119c:	64 e0       	ldi	r22, 0x04	; 4
     119e:	86 e0       	ldi	r24, 0x06	; 6
     11a0:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_char('0' + (left_intensity_average / 10) % 10);
     11a4:	80 91 01 07 	lds	r24, 0x0701	; 0x800701 <left_intensity_average>
     11a8:	90 91 02 07 	lds	r25, 0x0702	; 0x800702 <left_intensity_average+0x1>
     11ac:	be 01       	movw	r22, r28
@@ -2867,19 +2114,15 @@ void track(void)
     11b6:	0e 94 07 0a 	call	0x140e	; 0x140e <__divmodhi4>
     11ba:	80 5d       	subi	r24, 0xD0	; 208
     11bc:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + left_intensity_average % 10);
     11c0:	80 91 01 07 	lds	r24, 0x0701	; 0x800701 <left_intensity_average>
     11c4:	90 91 02 07 	lds	r25, 0x0702	; 0x800702 <left_intensity_average+0x1>
     11c8:	be 01       	movw	r22, r28
     11ca:	0e 94 07 0a 	call	0x140e	; 0x140e <__divmodhi4>
     11ce:	80 5d       	subi	r24, 0xD0	; 208
     11d0:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	
-	hx_set_coordinates(78, 4);
     11d4:	64 e0       	ldi	r22, 0x04	; 4
     11d6:	8e e4       	ldi	r24, 0x4E	; 78
     11d8:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
-	hx_write_char('0' + (right_intensity_average / 10) % 10);
     11dc:	80 91 0b 07 	lds	r24, 0x070B	; 0x80070b <right_intensity_average>
     11e0:	90 91 0c 07 	lds	r25, 0x070C	; 0x80070c <right_intensity_average+0x1>
     11e4:	be 01       	movw	r22, r28
@@ -2889,15 +2132,12 @@ void track(void)
     11ee:	0e 94 07 0a 	call	0x140e	; 0x140e <__divmodhi4>
     11f2:	80 5d       	subi	r24, 0xD0	; 208
     11f4:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	hx_write_char('0' + right_intensity_average % 10);
     11f8:	80 91 0b 07 	lds	r24, 0x070B	; 0x80070b <right_intensity_average>
     11fc:	90 91 0c 07 	lds	r25, 0x070C	; 0x80070c <right_intensity_average+0x1>
     1200:	be 01       	movw	r22, r28
     1202:	0e 94 07 0a 	call	0x140e	; 0x140e <__divmodhi4>
     1206:	80 5d       	subi	r24, 0xD0	; 208
     1208:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
-	
-	up_down_movement_gradient_request = up_intensity_average - down_intensity_average;
     120c:	80 91 0f 07 	lds	r24, 0x070F	; 0x80070f <up_intensity_average>
     1210:	90 91 10 07 	lds	r25, 0x0710	; 0x800710 <up_intensity_average+0x1>
     1214:	20 91 ff 06 	lds	r18, 0x06FF	; 0x8006ff <down_intensity_average>
@@ -2906,7 +2146,6 @@ void track(void)
     121e:	93 0b       	sbc	r25, r19
     1220:	90 93 08 07 	sts	0x0708, r25	; 0x800708 <up_down_movement_gradient_request+0x1>
     1224:	80 93 07 07 	sts	0x0707, r24	; 0x800707 <up_down_movement_gradient_request>
-	left_right_movement_gradient_request = left_intensity_average - right_intensity_average;
     1228:	20 91 01 07 	lds	r18, 0x0701	; 0x800701 <left_intensity_average>
     122c:	30 91 02 07 	lds	r19, 0x0702	; 0x800702 <left_intensity_average+0x1>
     1230:	40 91 0b 07 	lds	r20, 0x070B	; 0x80070b <right_intensity_average>
@@ -2915,8 +2154,6 @@ void track(void)
     123a:	35 0b       	sbc	r19, r21
     123c:	30 93 0a 07 	sts	0x070A, r19	; 0x80070a <left_right_movement_gradient_request+0x1>
     1240:	20 93 09 07 	sts	0x0709, r18	; 0x800709 <left_right_movement_gradient_request>
-	
-	if(abs(up_down_movement_gradient_request) > INCLINE_TRACKING_TOLERANCE)
     1244:	9c 01       	movw	r18, r24
     1246:	99 23       	and	r25, r25
     1248:	24 f4       	brge	.+8      	; 0x1252 <track+0x202>
@@ -2927,30 +2164,14 @@ void track(void)
     1252:	23 30       	cpi	r18, 0x03	; 3
     1254:	31 05       	cpc	r19, r1
     1256:	4c f0       	brlt	.+18     	; 0x126a <track+0x21a>
-	{
-		if(up_down_movement_gradient_request > 0)
     1258:	18 16       	cp	r1, r24
     125a:	19 06       	cpc	r1, r25
     125c:	1c f4       	brge	.+6      	; 0x1264 <track+0x214>
-		{
-			stand_incline_up();
     125e:	0e 94 ab 07 	call	0xf56	; 0xf56 <stand_incline_up>
     1262:	05 c0       	rjmp	.+10     	; 0x126e <track+0x21e>
-		}
-		else
-		{
-			stand_incline_down();
     1264:	0e 94 a6 07 	call	0xf4c	; 0xf4c <stand_incline_down>
     1268:	02 c0       	rjmp	.+4      	; 0x126e <track+0x21e>
-		}
-	}
-	else
-	{
-		stand_stop_incline();
     126a:	0e 94 b0 07 	call	0xf60	; 0xf60 <stand_stop_incline>
-	}
-	
-	if(abs(left_right_movement_gradient_request) > ROTATE_TRACKING_TOLERANCE)
     126e:	80 91 09 07 	lds	r24, 0x0709	; 0x800709 <left_right_movement_gradient_request>
     1272:	90 91 0a 07 	lds	r25, 0x070A	; 0x80070a <left_right_movement_gradient_request+0x1>
     1276:	9c 01       	movw	r18, r24
@@ -2963,26 +2184,13 @@ void track(void)
     1284:	23 30       	cpi	r18, 0x03	; 3
     1286:	31 05       	cpc	r19, r1
     1288:	4c f0       	brlt	.+18     	; 0x129c <track+0x24c>
-	{
-		if(left_right_movement_gradient_request > 0)
     128a:	18 16       	cp	r1, r24
     128c:	19 06       	cpc	r1, r25
     128e:	1c f4       	brge	.+6      	; 0x1296 <track+0x246>
-		{
-			stand_rotate_right();
     1290:	0e 94 a0 07 	call	0xf40	; 0xf40 <stand_rotate_right>
     1294:	05 c0       	rjmp	.+10     	; 0x12a0 <track+0x250>
-		}
-		else
-		{
-			stand_rotate_left();
     1296:	0e 94 9d 07 	call	0xf3a	; 0xf3a <stand_rotate_left>
     129a:	02 c0       	rjmp	.+4      	; 0x12a0 <track+0x250>
-		}
-	}
-	else
-	{
-		stand_stop_rotation();
     129c:	0e 94 a3 07 	call	0xf46	; 0xf46 <stand_stop_rotation>
     12a0:	2f ef       	ldi	r18, 0xFF	; 255
     12a2:	89 ef       	ldi	r24, 0xF9	; 249
@@ -2993,41 +2201,23 @@ void track(void)
     12ac:	e1 f7       	brne	.-8      	; 0x12a6 <track+0x256>
     12ae:	00 c0       	rjmp	.+0      	; 0x12b0 <track+0x260>
     12b0:	00 00       	nop
-	}
-	_delay_ms(40);
     12b2:	df 91       	pop	r29
     12b4:	cf 91       	pop	r28
     12b6:	08 95       	ret
 
 000012b8 <init_unipolar_control>:
-#include <util/delay.h>
-#include "unipolar_driver.h"
-
-void init_unipolar_control(void)
-{
-	UNIPOLAR_01_DDR |= ((1 << UNIPOLAR_01_STEP_1) | (1 << UNIPOLAR_01_STEP_2) | (1 << UNIPOLAR_01_STEP_3) | (1 << UNIPOLAR_01_STEP_4));
     12b8:	87 b3       	in	r24, 0x17	; 23
     12ba:	8f 60       	ori	r24, 0x0F	; 15
     12bc:	87 bb       	out	0x17, r24	; 23
-	UNIPOLAR_01_CLEAR_STEP_1;
     12be:	c0 98       	cbi	0x18, 0	; 24
-	UNIPOLAR_01_CLEAR_STEP_2;
     12c0:	c1 98       	cbi	0x18, 1	; 24
-	UNIPOLAR_01_CLEAR_STEP_3;
     12c2:	c2 98       	cbi	0x18, 2	; 24
-	UNIPOLAR_01_CLEAR_STEP_4;
     12c4:	c3 98       	cbi	0x18, 3	; 24
-	UNIPOLLAR_01_CURRENT_STEP = 4;
     12c6:	84 e0       	ldi	r24, 0x04	; 4
     12c8:	80 93 fd 06 	sts	0x06FD, r24	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
     12cc:	08 95       	ret
 
 000012ce <unipolar_01_step_forward>:
-}
-
-void unipolar_01_step_forward(unsigned char current_step)
-{
-	switch(current_step)
     12ce:	82 30       	cpi	r24, 0x02	; 2
     12d0:	89 f0       	breq	.+34     	; 0x12f4 <unipolar_01_step_forward+0x26>
     12d2:	18 f4       	brcc	.+6      	; 0x12da <unipolar_01_step_forward+0xc>
@@ -3039,66 +2229,31 @@ void unipolar_01_step_forward(unsigned char current_step)
     12de:	84 30       	cpi	r24, 0x04	; 4
     12e0:	c9 f0       	breq	.+50     	; 0x1314 <unipolar_01_step_forward+0x46>
     12e2:	1f c0       	rjmp	.+62     	; 0x1322 <unipolar_01_step_forward+0x54>
-	{
-		case 1:
-		{
-			UNIPOLAR_01_CLEAR_STEP_1;
     12e4:	c0 98       	cbi	0x18, 0	; 24
-			UNIPOLAR_01_SET_STEP_2;
     12e6:	c1 9a       	sbi	0x18, 1	; 24
-			UNIPOLAR_01_CLEAR_STEP_3;
     12e8:	c2 98       	cbi	0x18, 2	; 24
-			UNIPOLAR_01_CLEAR_STEP_4;
     12ea:	c3 98       	cbi	0x18, 3	; 24
-			UNIPOLLAR_01_CURRENT_STEP = 2;
     12ec:	82 e0       	ldi	r24, 0x02	; 2
     12ee:	80 93 fd 06 	sts	0x06FD, r24	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
-			break;
     12f2:	17 c0       	rjmp	.+46     	; 0x1322 <unipolar_01_step_forward+0x54>
-		}
-		case 2:
-		{
-			UNIPOLAR_01_CLEAR_STEP_1;
     12f4:	c0 98       	cbi	0x18, 0	; 24
-			UNIPOLAR_01_CLEAR_STEP_2;
     12f6:	c1 98       	cbi	0x18, 1	; 24
-			UNIPOLAR_01_SET_STEP_3;
     12f8:	c2 9a       	sbi	0x18, 2	; 24
-			UNIPOLAR_01_CLEAR_STEP_4;
     12fa:	c3 98       	cbi	0x18, 3	; 24
-			UNIPOLLAR_01_CURRENT_STEP = 3;
     12fc:	83 e0       	ldi	r24, 0x03	; 3
     12fe:	80 93 fd 06 	sts	0x06FD, r24	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
-			break;
     1302:	0f c0       	rjmp	.+30     	; 0x1322 <unipolar_01_step_forward+0x54>
-		}
-		case 3:
-		{
-			UNIPOLAR_01_CLEAR_STEP_1;
     1304:	c0 98       	cbi	0x18, 0	; 24
-			UNIPOLAR_01_CLEAR_STEP_2;
     1306:	c1 98       	cbi	0x18, 1	; 24
-			UNIPOLAR_01_CLEAR_STEP_3;
     1308:	c2 98       	cbi	0x18, 2	; 24
-			UNIPOLAR_01_SET_STEP_4;
     130a:	c3 9a       	sbi	0x18, 3	; 24
-			UNIPOLLAR_01_CURRENT_STEP = 4;
     130c:	84 e0       	ldi	r24, 0x04	; 4
     130e:	80 93 fd 06 	sts	0x06FD, r24	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
-			break;
     1312:	07 c0       	rjmp	.+14     	; 0x1322 <unipolar_01_step_forward+0x54>
-		}
-		case 4:
-		{
-			UNIPOLAR_01_SET_STEP_1;
     1314:	c0 9a       	sbi	0x18, 0	; 24
-			UNIPOLAR_01_CLEAR_STEP_2;
     1316:	c1 98       	cbi	0x18, 1	; 24
-			UNIPOLAR_01_CLEAR_STEP_3;
     1318:	c2 98       	cbi	0x18, 2	; 24
-			UNIPOLAR_01_CLEAR_STEP_4;
     131a:	c3 98       	cbi	0x18, 3	; 24
-			UNIPOLLAR_01_CURRENT_STEP = 1;
     131c:	81 e0       	ldi	r24, 0x01	; 1
     131e:	80 93 fd 06 	sts	0x06FD, r24	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
     1322:	8f e6       	ldi	r24, 0x6F	; 111
@@ -3110,12 +2265,6 @@ void unipolar_01_step_forward(unsigned char current_step)
     132e:	08 95       	ret
 
 00001330 <unipolar_01_step_backward>:
-	_delay_ms(3);
-}
-
-void unipolar_01_step_backward(unsigned char current_step)
-{
-	switch(current_step)
     1330:	82 30       	cpi	r24, 0x02	; 2
     1332:	89 f0       	breq	.+34     	; 0x1356 <unipolar_01_step_backward+0x26>
     1334:	18 f4       	brcc	.+6      	; 0x133c <unipolar_01_step_backward+0xc>
@@ -3127,66 +2276,31 @@ void unipolar_01_step_backward(unsigned char current_step)
     1340:	84 30       	cpi	r24, 0x04	; 4
     1342:	c9 f0       	breq	.+50     	; 0x1376 <unipolar_01_step_backward+0x46>
     1344:	1f c0       	rjmp	.+62     	; 0x1384 <unipolar_01_step_backward+0x54>
-	{
-		case 1:
-		{
-			UNIPOLAR_01_CLEAR_STEP_1;
     1346:	c0 98       	cbi	0x18, 0	; 24
-			UNIPOLAR_01_CLEAR_STEP_2;
     1348:	c1 98       	cbi	0x18, 1	; 24
-			UNIPOLAR_01_CLEAR_STEP_3;
     134a:	c2 98       	cbi	0x18, 2	; 24
-			UNIPOLAR_01_SET_STEP_4;
     134c:	c3 9a       	sbi	0x18, 3	; 24
-			UNIPOLLAR_01_CURRENT_STEP = 4;
     134e:	84 e0       	ldi	r24, 0x04	; 4
     1350:	80 93 fd 06 	sts	0x06FD, r24	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
-			break;
     1354:	17 c0       	rjmp	.+46     	; 0x1384 <unipolar_01_step_backward+0x54>
-		}
-		case 2:
-		{
-			UNIPOLAR_01_SET_STEP_1;
     1356:	c0 9a       	sbi	0x18, 0	; 24
-			UNIPOLAR_01_CLEAR_STEP_2;
     1358:	c1 98       	cbi	0x18, 1	; 24
-			UNIPOLAR_01_CLEAR_STEP_3;
     135a:	c2 98       	cbi	0x18, 2	; 24
-			UNIPOLAR_01_CLEAR_STEP_4;
     135c:	c3 98       	cbi	0x18, 3	; 24
-			UNIPOLLAR_01_CURRENT_STEP = 1;
     135e:	81 e0       	ldi	r24, 0x01	; 1
     1360:	80 93 fd 06 	sts	0x06FD, r24	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
-			break;
     1364:	0f c0       	rjmp	.+30     	; 0x1384 <unipolar_01_step_backward+0x54>
-		}
-		case 3:
-		{
-			UNIPOLAR_01_CLEAR_STEP_1;
     1366:	c0 98       	cbi	0x18, 0	; 24
-			UNIPOLAR_01_SET_STEP_2;
     1368:	c1 9a       	sbi	0x18, 1	; 24
-			UNIPOLAR_01_CLEAR_STEP_3;
     136a:	c2 98       	cbi	0x18, 2	; 24
-			UNIPOLAR_01_CLEAR_STEP_4;
     136c:	c3 98       	cbi	0x18, 3	; 24
-			UNIPOLLAR_01_CURRENT_STEP = 2;
     136e:	82 e0       	ldi	r24, 0x02	; 2
     1370:	80 93 fd 06 	sts	0x06FD, r24	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
-			break;
     1374:	07 c0       	rjmp	.+14     	; 0x1384 <unipolar_01_step_backward+0x54>
-		}
-		case 4:
-		{
-			UNIPOLAR_01_CLEAR_STEP_1;
     1376:	c0 98       	cbi	0x18, 0	; 24
-			UNIPOLAR_01_CLEAR_STEP_2;
     1378:	c1 98       	cbi	0x18, 1	; 24
-			UNIPOLAR_01_SET_STEP_3;
     137a:	c2 9a       	sbi	0x18, 2	; 24
-			UNIPOLAR_01_CLEAR_STEP_4;
     137c:	c3 98       	cbi	0x18, 3	; 24
-			UNIPOLLAR_01_CURRENT_STEP = 3;
     137e:	83 e0       	ldi	r24, 0x03	; 3
     1380:	80 93 fd 06 	sts	0x06FD, r24	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
     1384:	8f e6       	ldi	r24, 0x6F	; 111
@@ -3198,72 +2312,35 @@ void unipolar_01_step_backward(unsigned char current_step)
     1390:	08 95       	ret
 
 00001392 <unipolar_01_clear_steps>:
-	_delay_ms(3);
-}
-
-void unipolar_01_clear_steps(void)
-{
-	UNIPOLAR_01_CLEAR_STEP_1;
     1392:	c0 98       	cbi	0x18, 0	; 24
-	UNIPOLAR_01_CLEAR_STEP_2;
     1394:	c1 98       	cbi	0x18, 1	; 24
-	UNIPOLAR_01_CLEAR_STEP_3;
     1396:	c2 98       	cbi	0x18, 2	; 24
-	UNIPOLAR_01_CLEAR_STEP_4;
     1398:	c3 98       	cbi	0x18, 3	; 24
     139a:	08 95       	ret
 
 0000139c <init_next_state_button>:
-}
-
-
-void init_next_state_button(void)
-{
-	BUTTON_1_DRR &= ~(1 << BUTTON_1_PIN); // PD2 is input
     139c:	8a 98       	cbi	0x11, 2	; 17
-
-	BUTTON_1_PORT |= (1 << BUTTON_1_PIN);    // turn on the pull-up resistor
     139e:	92 9a       	sbi	0x12, 2	; 18
-	// PD2 is now an input with pull-up enabled
-
-
-
-	MCUCR &= ~(1 << ISC00 | 1 << ISC01);    // low level of INT0 generates an interrupt request: when BUTTON_1 is pressed
     13a0:	85 b7       	in	r24, 0x35	; 53
     13a2:	8c 7f       	andi	r24, 0xFC	; 252
     13a4:	85 bf       	out	0x35, r24	; 53
-	GICR |= (1 << INT0);     // turns on INT0
     13a6:	8b b7       	in	r24, 0x3b	; 59
     13a8:	80 64       	ori	r24, 0x40	; 64
     13aa:	8b bf       	out	0x3b, r24	; 59
     13ac:	08 95       	ret
 
 000013ae <init_user_interface>:
-
-
-
-void init_user_interface(void)
-{
-	init_next_state_button();
     13ae:	0e 94 ce 09 	call	0x139c	; 0x139c <init_next_state_button>
     13b2:	08 95       	ret
 
 000013b4 <__vector_1>:
-	MCUCR &= ~(1 << ISC00 | 1 << ISC01);    // low level of INT0 generates an interrupt request: when BUTTON_1 is pressed
-	GICR |= (1 << INT0);     // turns on INT0
-}
-
-ISR (INT0_vect)
-{
     13b4:	1f 92       	push	r1
     13b6:	0f 92       	push	r0
     13b8:	0f b6       	in	r0, 0x3f	; 63
     13ba:	0f 92       	push	r0
     13bc:	11 24       	eor	r1, r1
     13be:	8f 93       	push	r24
-	cli(); // temporarily disable interrupts
     13c0:	f8 94       	cli
-	switch(STATE)
     13c2:	80 91 fe 06 	lds	r24, 0x06FE	; 0x8006fe <STATE>
     13c6:	82 30       	cpi	r24, 0x02	; 2
     13c8:	69 f0       	breq	.+26     	; 0x13e4 <__vector_1+0x30>
@@ -3276,47 +2353,20 @@ ISR (INT0_vect)
     13d6:	84 30       	cpi	r24, 0x04	; 4
     13d8:	69 f0       	breq	.+26     	; 0x13f4 <__vector_1+0x40>
     13da:	10 c0       	rjmp	.+32     	; 0x13fc <__vector_1+0x48>
-	{
-		case STATE_IDLE:
-		{
-			STATE = STATE_MANUAL;
     13dc:	82 e0       	ldi	r24, 0x02	; 2
     13de:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
-			break;
     13e2:	0f c0       	rjmp	.+30     	; 0x1402 <__vector_1+0x4e>
-		}
-		case STATE_MANUAL:
-		{
-			STATE = STATE_TRACKING;
     13e4:	83 e0       	ldi	r24, 0x03	; 3
     13e6:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
-			break;
     13ea:	0b c0       	rjmp	.+22     	; 0x1402 <__vector_1+0x4e>
-		}
-		case STATE_TRACKING:
-		{
-			STATE = STATE_MONITORING;
     13ec:	84 e0       	ldi	r24, 0x04	; 4
     13ee:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
-			break;
     13f2:	07 c0       	rjmp	.+14     	; 0x1402 <__vector_1+0x4e>
-		}
-		case STATE_MONITORING:
-		{
-			STATE = STATE_IDLE;
     13f4:	81 e0       	ldi	r24, 0x01	; 1
     13f6:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
-			break;
     13fa:	03 c0       	rjmp	.+6      	; 0x1402 <__vector_1+0x4e>
-		}
-		default:
-		{
-			STATE = STATE_IDLE;
     13fc:	81 e0       	ldi	r24, 0x01	; 1
     13fe:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
-			break;
-		}
-	}
     1402:	8f 91       	pop	r24
     1404:	0f 90       	pop	r0
     1406:	0f be       	out	0x3f, r0	; 63

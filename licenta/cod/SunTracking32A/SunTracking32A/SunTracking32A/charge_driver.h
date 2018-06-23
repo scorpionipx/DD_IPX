@@ -5,6 +5,7 @@
  *  Author: ScorpionIPX
  */ 
 
+#include <avr/io.h>
 
 #ifndef CHARGE_DRIVER_H_
 #define CHARGE_DRIVER_H_
@@ -18,8 +19,19 @@
 #define V_BAT_GAIN 975  // as unit of 1000
 #define V_CHR_GAIL 975  // as unit of 1000
 
+#define RELAY_PIN PIND6
+#define RELAY_PORT PORTD
+#define RELAY_DDR DDRD
+#define TURN_ON_RELAY (RELAY_PORT |= 1 << RELAY_PIN)
+#define TURN_OFF_RELAY (RELAY_PORT &= ~(1 << RELAY_PIN))
+
 
 unsigned int get_battery_voltage(void);
 unsigned int get_converter_voltage(void);
+void init_charge_control(void);
+void turn_on_charging(void);
+void turn_off_charging(void);
+
+
 
 #endif /* CHARGE_DRIVER_H_ */
