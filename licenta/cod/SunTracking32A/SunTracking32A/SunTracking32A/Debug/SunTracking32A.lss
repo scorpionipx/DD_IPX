@@ -96,22 +96,51 @@ Disassembly of section .text:
       8e:	0c 94 00 00 	jmp	0	; 0x0 <__vectors>
 
 00000092 <ADC_init>:
-      92:	14 ba       	out	0x14, r1	; 20
+
+#include <avr/io.h>
+
+void ADC_init(void)
+{
+	DDRA = 0x00;
+      92:	1a ba       	out	0x1a, r1	; 26
+	// AREF = AVcc
+	ADMUX = (1<<REFS0);
       94:	80 e4       	ldi	r24, 0x40	; 64
       96:	87 b9       	out	0x07, r24	; 7
+	
+	// ADC Enable and prescaler of 128
+	// 16000000/128 = 125000
+	ADCSRA = (1<<ADEN)|(1<<ADPS2)|(1<<ADPS1)|(1<<ADPS0);
       98:	87 e8       	ldi	r24, 0x87	; 135
       9a:	86 b9       	out	0x06, r24	; 6
       9c:	08 95       	ret
 
 0000009e <ADC_get_value>:
+{
+	// select the corresponding channel 0~7
+	// ANDing with '7' will always keep the value
+	// of 'ch' between 0 and 7
+	ch &= 0b00000111;  // AND operation with 7
+	ADMUX = (ADMUX & 0xF8)|ch;     // clears the bottom 3 bits before ORing
       9e:	97 b1       	in	r25, 0x07	; 7
       a0:	98 7f       	andi	r25, 0xF8	; 248
       a2:	87 70       	andi	r24, 0x07	; 7
       a4:	89 2b       	or	r24, r25
       a6:	87 b9       	out	0x07, r24	; 7
+	
+	// start single conversion
+	// write '1' to ADSC
+	ADCSRA |= (1<<ADSC);
       a8:	36 9a       	sbi	0x06, 6	; 6
+	
+	// wait for conversion to complete
+	// ADSC becomes '0' again
+	// till then, run loop continuously
+	while(ADCSRA & (1<<ADSC));
       aa:	36 99       	sbic	0x06, 6	; 6
       ac:	fe cf       	rjmp	.-4      	; 0xaa <ADC_get_value+0xc>
+	
+	return (ADC);
       ae:	84 b1       	in	r24, 0x04	; 4
       b0:	95 b1       	in	r25, 0x05	; 5
       b2:	08 95       	ret
@@ -1339,12 +1368,43 @@ unsigned int get_converter_voltage(void)
      b0e:	08 95       	ret
 
 00000b10 <hx_send_data>:
+}
+
+void hx_send_data(unsigned char _data)
+{
+	// activate hx1230
+	CLEAR_HX_CE;
      b10:	a9 98       	cbi	0x15, 1	; 21
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
+	
+	// configure communication for data transfer
+	SET_HX_DIN;
      b12:	ae 9a       	sbi	0x15, 6	; 21
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
+	
+	// toggle clock
+	SET_HX_CLK;
      b14:	af 9a       	sbi	0x15, 7	; 21
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
+	CLEAR_HX_CLK;
      b16:	af 98       	cbi	0x15, 7	; 21
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
+	
+	// send the actual data, MSB fiHX_RST
+	for(int bit_position = 7; bit_position >= 0; bit_position--)
      b18:	27 e0       	ldi	r18, 0x07	; 7
      b1a:	30 e0       	ldi	r19, 0x00	; 0
+	{
+		// calculate bit to be send
+		if(((_data >> bit_position) & 1) == 1)
      b1c:	90 e0       	ldi	r25, 0x00	; 0
      b1e:	ac 01       	movw	r20, r24
      b20:	02 2e       	mov	r0, r18
@@ -1355,24 +1415,82 @@ unsigned int get_converter_voltage(void)
      b2a:	e2 f7       	brpl	.-8      	; 0xb24 <hx_send_data+0x14>
      b2c:	40 ff       	sbrs	r20, 0
      b2e:	02 c0       	rjmp	.+4      	; 0xb34 <hx_send_data+0x24>
+		{
+			SET_HX_DIN;
      b30:	ae 9a       	sbi	0x15, 6	; 21
      b32:	01 c0       	rjmp	.+2      	; 0xb36 <hx_send_data+0x26>
+			_delay_us(HX_DELAY_US);
+			#endif
+		}
+		else
+		{
+			CLEAR_HX_DIN;
      b34:	ae 98       	cbi	0x15, 6	; 21
+			_delay_us(HX_DELAY_US);
+			#endif
+		}
+		
+		// toggle clock
+		SET_HX_CLK;
      b36:	af 9a       	sbi	0x15, 7	; 21
+		#ifdef HX_DELAY_ENABLED
+		_delay_us(HX_DELAY_US);
+		#endif
+		CLEAR_HX_CLK;
      b38:	af 98       	cbi	0x15, 7	; 21
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
+	
+	// send the actual data, MSB fiHX_RST
+	for(int bit_position = 7; bit_position >= 0; bit_position--)
      b3a:	21 50       	subi	r18, 0x01	; 1
      b3c:	31 09       	sbc	r19, r1
      b3e:	78 f7       	brcc	.-34     	; 0xb1e <hx_send_data+0xe>
+		_delay_us(HX_DELAY_US);
+		#endif
+	}
+	
+	// deactivate hx1230
+	SET_HX_CE;
      b40:	a9 9a       	sbi	0x15, 1	; 21
      b42:	08 95       	ret
 
 00000b44 <hx_send_command>:
+}
+
+void hx_send_command(unsigned char _command)
+{
+	// activate hx1230
+	CLEAR_HX_CE;
      b44:	a9 98       	cbi	0x15, 1	; 21
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
+	
+	// configure communication for command transfer
+	CLEAR_HX_DIN;
      b46:	ae 98       	cbi	0x15, 6	; 21
+	
+	// toggle clock
+	SET_HX_CLK;
      b48:	af 9a       	sbi	0x15, 7	; 21
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
+	CLEAR_HX_CLK;
      b4a:	af 98       	cbi	0x15, 7	; 21
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
+	
+	// send the actual command, MSB fiHX_RST
+	for(int bit_position = 7; bit_position >= 0; bit_position--)
      b4c:	27 e0       	ldi	r18, 0x07	; 7
      b4e:	30 e0       	ldi	r19, 0x00	; 0
+	{
+		// calculate bit to be send
+		if(((_command >> bit_position) & 1) == 1)
      b50:	90 e0       	ldi	r25, 0x00	; 0
      b52:	ac 01       	movw	r20, r24
      b54:	02 2e       	mov	r0, r18
@@ -1383,22 +1501,65 @@ unsigned int get_converter_voltage(void)
      b5e:	e2 f7       	brpl	.-8      	; 0xb58 <hx_send_command+0x14>
      b60:	40 ff       	sbrs	r20, 0
      b62:	02 c0       	rjmp	.+4      	; 0xb68 <hx_send_command+0x24>
+		{
+			SET_HX_DIN;
      b64:	ae 9a       	sbi	0x15, 6	; 21
      b66:	01 c0       	rjmp	.+2      	; 0xb6a <hx_send_command+0x26>
+			_delay_us(HX_DELAY_US);
+			#endif
+		}
+		else
+		{
+			CLEAR_HX_DIN;
      b68:	ae 98       	cbi	0x15, 6	; 21
+			_delay_us(HX_DELAY_US);
+			#endif
+		}
+		
+		// toggle clock
+		SET_HX_CLK;
      b6a:	af 9a       	sbi	0x15, 7	; 21
+		#ifdef HX_DELAY_ENABLED
+		_delay_us(HX_DELAY_US);
+		#endif
+		CLEAR_HX_CLK;
      b6c:	af 98       	cbi	0x15, 7	; 21
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
+	
+	// send the actual command, MSB fiHX_RST
+	for(int bit_position = 7; bit_position >= 0; bit_position--)
      b6e:	21 50       	subi	r18, 0x01	; 1
      b70:	31 09       	sbc	r19, r1
      b72:	78 f7       	brcc	.-34     	; 0xb52 <hx_send_command+0xe>
+		_delay_us(HX_DELAY_US);
+		#endif
+	}
+	
+	// deactivate hx1230
+	SET_HX_CE;
      b74:	a9 9a       	sbi	0x15, 1	; 21
      b76:	08 95       	ret
 
 00000b78 <init_hx1230_control>:
+
+
+void init_hx1230_control(void)
+{
+	// set required pins as output
+	HX1230_DDR |= ((1 << HX_RST) | (1 << HX_CE) | (1 << HX_DIN) | (1 << HX_CLK));
      b78:	84 b3       	in	r24, 0x14	; 20
      b7a:	83 6c       	ori	r24, 0xC3	; 195
      b7c:	84 bb       	out	0x14, r24	; 20
+	
+	// set idle state
+	CLEAR_HX_CLK;
      b7e:	af 98       	cbi	0x15, 7	; 21
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
+	CLEAR_HX_RST;
      b80:	a8 98       	cbi	0x15, 0	; 21
 	#else
 		//round up by default
@@ -1415,7 +1576,16 @@ unsigned int get_converter_voltage(void)
      b8e:	e1 f7       	brne	.-8      	; 0xb88 <init_hx1230_control+0x10>
      b90:	00 c0       	rjmp	.+0      	; 0xb92 <init_hx1230_control+0x1a>
      b92:	00 00       	nop
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
+	_delay_ms(50);
+	SET_HX_RST;
      b94:	a8 9a       	sbi	0x15, 0	; 21
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
+	CLEAR_HX_CE;
      b96:	a9 98       	cbi	0x15, 1	; 21
      b98:	8f ec       	ldi	r24, 0xCF	; 207
      b9a:	97 e0       	ldi	r25, 0x07	; 7
@@ -1423,6 +1593,11 @@ unsigned int get_converter_voltage(void)
      b9e:	f1 f7       	brne	.-4      	; 0xb9c <init_hx1230_control+0x24>
      ba0:	00 c0       	rjmp	.+0      	; 0xba2 <init_hx1230_control+0x2a>
      ba2:	00 00       	nop
+	#ifdef HX_DELAY_ENABLED
+	_delay_us(HX_DELAY_US);
+	#endif
+	_delay_ms(1);
+	SET_HX_CE;
      ba4:	a9 9a       	sbi	0x15, 1	; 21
      ba6:	8f ec       	ldi	r24, 0xCF	; 207
      ba8:	97 e0       	ldi	r25, 0x07	; 7
@@ -1430,85 +1605,187 @@ unsigned int get_converter_voltage(void)
      bac:	f1 f7       	brne	.-4      	; 0xbaa <init_hx1230_control+0x32>
      bae:	00 c0       	rjmp	.+0      	; 0xbb0 <init_hx1230_control+0x38>
      bb0:	00 00       	nop
+	_delay_ms(1);
+	
+	// commands needed to initialize hx1230 display
+	// found within a chinese data sheet
+	
+	hx_send_command(0x2f);
      bb2:	8f e2       	ldi	r24, 0x2F	; 47
      bb4:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
+	hx_send_command(0x90);
      bb8:	80 e9       	ldi	r24, 0x90	; 144
      bba:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
+	hx_send_command(0xa6);
      bbe:	86 ea       	ldi	r24, 0xA6	; 166
      bc0:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
+	hx_send_command(0xa4);
      bc4:	84 ea       	ldi	r24, 0xA4	; 164
      bc6:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
+	hx_send_command(0xaf);
      bca:	8f ea       	ldi	r24, 0xAF	; 175
      bcc:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
+	
+	hx_send_command(0x40);
      bd0:	80 e4       	ldi	r24, 0x40	; 64
      bd2:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
+	hx_send_command(0xb0);
      bd6:	80 eb       	ldi	r24, 0xB0	; 176
      bd8:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
+	hx_send_command(0x10);
      bdc:	80 e1       	ldi	r24, 0x10	; 16
      bde:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
+	hx_send_command(0x00);
      be2:	80 e0       	ldi	r24, 0x00	; 0
      be4:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
      be8:	08 95       	ret
 
 00000bea <hx_set_coordinates>:
+	// deactivate hx1230
+	SET_HX_CE;
+}
+
+void hx_set_coordinates(unsigned char _x, unsigned char _y)
+{
      bea:	cf 93       	push	r28
      bec:	c8 2f       	mov	r28, r24
+	// 0, 0 is the upper left corner
+	
+	hx_send_command(0xB0 + _y);
      bee:	80 eb       	ldi	r24, 0xB0	; 176
      bf0:	86 0f       	add	r24, r22
      bf2:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
+	hx_send_command(0x10 | ((_x & 0x7F) >> 4));
      bf6:	8c 2f       	mov	r24, r28
      bf8:	8f 77       	andi	r24, 0x7F	; 127
      bfa:	82 95       	swap	r24
      bfc:	8f 70       	andi	r24, 0x0F	; 15
      bfe:	80 61       	ori	r24, 0x10	; 16
      c00:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
+	hx_send_command(0x0F & _x);
      c04:	8c 2f       	mov	r24, r28
      c06:	8f 70       	andi	r24, 0x0F	; 15
      c08:	0e 94 a2 05 	call	0xb44	; 0xb44 <hx_send_command>
+}
      c0c:	cf 91       	pop	r28
      c0e:	08 95       	ret
 
 00000c10 <hx_clear_screen>:
+
+void hx_clear_screen(void)
+{
      c10:	cf 93       	push	r28
      c12:	df 93       	push	r29
+	unsigned char col, row;
+	
+	hx_set_coordinates(0, 0);
      c14:	60 e0       	ldi	r22, 0x00	; 0
      c16:	80 e0       	ldi	r24, 0x00	; 0
      c18:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
      c1c:	d9 e0       	ldi	r29, 0x09	; 9
      c1e:	07 c0       	rjmp	.+14     	; 0xc2e <hx_clear_screen+0x1e>
+	
+	for(row = 0; row <= HX_MAX_ROW_ROOT; row ++)
+	{
+		for(col = 0; col <= HX_MAX_COL; col ++)
+		{
+			hx_send_data(0x00);
      c20:	80 e0       	ldi	r24, 0x00	; 0
      c22:	0e 94 88 05 	call	0xb10	; 0xb10 <hx_send_data>
      c26:	c1 50       	subi	r28, 0x01	; 1
+	
+	hx_set_coordinates(0, 0);
+	
+	for(row = 0; row <= HX_MAX_ROW_ROOT; row ++)
+	{
+		for(col = 0; col <= HX_MAX_COL; col ++)
      c28:	d9 f7       	brne	.-10     	; 0xc20 <hx_clear_screen+0x10>
      c2a:	d1 50       	subi	r29, 0x01	; 1
+{
+	unsigned char col, row;
+	
+	hx_set_coordinates(0, 0);
+	
+	for(row = 0; row <= HX_MAX_ROW_ROOT; row ++)
      c2c:	11 f0       	breq	.+4      	; 0xc32 <hx_clear_screen+0x22>
+	hx_send_command(0x10 | ((_x & 0x7F) >> 4));
+	hx_send_command(0x0F & _x);
+}
+
+void hx_clear_screen(void)
+{
      c2e:	c1 e6       	ldi	r28, 0x61	; 97
      c30:	f7 cf       	rjmp	.-18     	; 0xc20 <hx_clear_screen+0x10>
+		for(col = 0; col <= HX_MAX_COL; col ++)
+		{
+			hx_send_data(0x00);
+		}
+	}
+}
      c32:	df 91       	pop	r29
      c34:	cf 91       	pop	r28
      c36:	08 95       	ret
 
 00000c38 <hx_fill_screen>:
+
+void hx_fill_screen(void)
+{
      c38:	cf 93       	push	r28
      c3a:	df 93       	push	r29
+	unsigned char col, row;
+	
+	hx_set_coordinates(0, 0);
      c3c:	60 e0       	ldi	r22, 0x00	; 0
      c3e:	80 e0       	ldi	r24, 0x00	; 0
      c40:	0e 94 f5 05 	call	0xbea	; 0xbea <hx_set_coordinates>
      c44:	d9 e0       	ldi	r29, 0x09	; 9
      c46:	07 c0       	rjmp	.+14     	; 0xc56 <hx_fill_screen+0x1e>
+	
+	for(row = 0; row < 9; row ++)
+	{
+		for(col = 0; col < 96; col ++)
+		{
+			hx_send_data(0xFF);
      c48:	8f ef       	ldi	r24, 0xFF	; 255
      c4a:	0e 94 88 05 	call	0xb10	; 0xb10 <hx_send_data>
      c4e:	c1 50       	subi	r28, 0x01	; 1
+	
+	hx_set_coordinates(0, 0);
+	
+	for(row = 0; row < 9; row ++)
+	{
+		for(col = 0; col < 96; col ++)
      c50:	d9 f7       	brne	.-10     	; 0xc48 <hx_fill_screen+0x10>
      c52:	d1 50       	subi	r29, 0x01	; 1
+{
+	unsigned char col, row;
+	
+	hx_set_coordinates(0, 0);
+	
+	for(row = 0; row < 9; row ++)
      c54:	11 f0       	breq	.+4      	; 0xc5a <hx_fill_screen+0x22>
+		}
+	}
+}
+
+void hx_fill_screen(void)
+{
      c56:	c0 e6       	ldi	r28, 0x60	; 96
      c58:	f7 cf       	rjmp	.-18     	; 0xc48 <hx_fill_screen+0x10>
+		for(col = 0; col < 96; col ++)
+		{
+			hx_send_data(0xFF);
+		}
+	}
+}
      c5a:	df 91       	pop	r29
      c5c:	cf 91       	pop	r28
      c5e:	08 95       	ret
 
 00000c60 <hx_write_char>:
+
+void hx_write_char(const unsigned char _character)
+{
      c60:	0f 93       	push	r16
      c62:	1f 93       	push	r17
      c64:	cf 93       	push	r28
@@ -1534,11 +1811,25 @@ unsigned int get_converter_voltage(void)
      c8c:	11 1f       	adc	r17, r17
      c8e:	05 50       	subi	r16, 0x05	; 5
      c90:	1f 4f       	sbci	r17, 0xFF	; 255
+	
+	for(int row_index = 0; row_index < 6; row_index ++)
+	{
+		hx_send_data(HX_character[_character][row_index]);
      c92:	89 91       	ld	r24, Y+
      c94:	0e 94 88 05 	call	0xb10	; 0xb10 <hx_send_data>
+}
+
+void hx_write_char(const unsigned char _character)
+{
+	
+	for(int row_index = 0; row_index < 6; row_index ++)
      c98:	c0 17       	cp	r28, r16
      c9a:	d1 07       	cpc	r29, r17
      c9c:	d1 f7       	brne	.-12     	; 0xc92 <hx_write_char+0x32>
+	{
+		hx_send_data(HX_character[_character][row_index]);
+	}
+}
      c9e:	df 91       	pop	r29
      ca0:	cf 91       	pop	r28
      ca2:	1f 91       	pop	r17
@@ -1546,10 +1837,14 @@ unsigned int get_converter_voltage(void)
      ca6:	08 95       	ret
 
 00000ca8 <hx_write_string>:
+
+void hx_write_string(const char *_characters_array)
+{
      ca8:	0f 93       	push	r16
      caa:	1f 93       	push	r17
      cac:	cf 93       	push	r28
      cae:	df 93       	push	r29
+	int string_length = strlen(_characters_array);
      cb0:	fc 01       	movw	r30, r24
      cb2:	01 90       	ld	r0, Z+
      cb4:	00 20       	and	r0, r0
@@ -1557,6 +1852,7 @@ unsigned int get_converter_voltage(void)
      cb8:	31 97       	sbiw	r30, 0x01	; 1
      cba:	e8 1b       	sub	r30, r24
      cbc:	f9 0b       	sbc	r31, r25
+	for(int char_index = 0; char_index < string_length; char_index++)
      cbe:	1e 16       	cp	r1, r30
      cc0:	1f 06       	cpc	r1, r31
      cc2:	54 f4       	brge	.+20     	; 0xcd8 <hx_write_string+0x30>
@@ -1564,11 +1860,22 @@ unsigned int get_converter_voltage(void)
      cc6:	8c 01       	movw	r16, r24
      cc8:	0e 0f       	add	r16, r30
      cca:	1f 1f       	adc	r17, r31
+	{
+		hx_write_char((const unsigned char)(_characters_array[char_index]));
      ccc:	89 91       	ld	r24, Y+
      cce:	0e 94 30 06 	call	0xc60	; 0xc60 <hx_write_char>
+}
+
+void hx_write_string(const char *_characters_array)
+{
+	int string_length = strlen(_characters_array);
+	for(int char_index = 0; char_index < string_length; char_index++)
      cd2:	c0 17       	cp	r28, r16
      cd4:	d1 07       	cpc	r29, r17
      cd6:	d1 f7       	brne	.-12     	; 0xccc <hx_write_string+0x24>
+	{
+		hx_write_char((const unsigned char)(_characters_array[char_index]));
+	}
      cd8:	df 91       	pop	r29
      cda:	cf 91       	pop	r28
      cdc:	1f 91       	pop	r17
@@ -1576,44 +1883,79 @@ unsigned int get_converter_voltage(void)
      ce0:	08 95       	ret
 
 00000ce2 <manual_control>:
+#include "sg90_driver.h"
+#include "unipolar_driver.h"
+#include "l293d.h"
+
+void manual_control(void)
+{
      ce2:	0f 93       	push	r16
      ce4:	1f 93       	push	r17
      ce6:	cf 93       	push	r28
      ce8:	df 93       	push	r29
+	unsigned int x = ADC_get_value(ADC_CHANNEL_X_AXIS);
      cea:	84 e0       	ldi	r24, 0x04	; 4
      cec:	0e 94 4f 00 	call	0x9e	; 0x9e <ADC_get_value>
      cf0:	ec 01       	movw	r28, r24
+	unsigned int y = ADC_get_value(ADC_CHANNEL_Y_AXIS);
      cf2:	85 e0       	ldi	r24, 0x05	; 5
      cf4:	0e 94 4f 00 	call	0x9e	; 0x9e <ADC_get_value>
      cf8:	8c 01       	movw	r16, r24
+	
+	display_joystick_data(x, y);
      cfa:	bc 01       	movw	r22, r24
      cfc:	ce 01       	movw	r24, r28
      cfe:	0e 94 dd 01 	call	0x3ba	; 0x3ba <display_joystick_data>
+	
+	if(y > (JOYSTICK_IDLE_VALUE + JOYSTICK_DEAD_ZONE))
      d02:	05 36       	cpi	r16, 0x65	; 101
      d04:	82 e0       	ldi	r24, 0x02	; 2
      d06:	18 07       	cpc	r17, r24
      d08:	28 f0       	brcs	.+10     	; 0xd14 <manual_control+0x32>
+	{
+		unipolar_01_step_backward(UNIPOLLAR_01_CURRENT_STEP);
      d0a:	80 91 fd 06 	lds	r24, 0x06FD	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
      d0e:	0e 94 98 09 	call	0x1330	; 0x1330 <unipolar_01_step_backward>
      d12:	0a c0       	rjmp	.+20     	; 0xd28 <manual_control+0x46>
+	}
+	else if(y < (JOYSTICK_IDLE_VALUE - JOYSTICK_DEAD_ZONE))
      d14:	0c 39       	cpi	r16, 0x9C	; 156
      d16:	11 40       	sbci	r17, 0x01	; 1
      d18:	28 f4       	brcc	.+10     	; 0xd24 <manual_control+0x42>
+	{
+		unipolar_01_step_forward(UNIPOLLAR_01_CURRENT_STEP);
      d1a:	80 91 fd 06 	lds	r24, 0x06FD	; 0x8006fd <UNIPOLLAR_01_CURRENT_STEP>
      d1e:	0e 94 67 09 	call	0x12ce	; 0x12ce <unipolar_01_step_forward>
      d22:	02 c0       	rjmp	.+4      	; 0xd28 <manual_control+0x46>
+	}
+	else
+	{
+		unipolar_01_clear_steps();
      d24:	0e 94 c9 09 	call	0x1392	; 0x1392 <unipolar_01_clear_steps>
+	}
+	
+	if(x > (JOYSTICK_IDLE_VALUE + JOYSTICK_DEAD_ZONE))
      d28:	c5 36       	cpi	r28, 0x65	; 101
      d2a:	82 e0       	ldi	r24, 0x02	; 2
      d2c:	d8 07       	cpc	r29, r24
      d2e:	18 f0       	brcs	.+6      	; 0xd36 <manual_control+0x54>
+	{
+		l293d_hb2_rotate_right();
      d30:	0e 94 bf 06 	call	0xd7e	; 0xd7e <l293d_hb2_rotate_right>
      d34:	08 c0       	rjmp	.+16     	; 0xd46 <manual_control+0x64>
+	}
+	else if(x < (JOYSTICK_IDLE_VALUE - JOYSTICK_DEAD_ZONE))
      d36:	cc 39       	cpi	r28, 0x9C	; 156
      d38:	d1 40       	sbci	r29, 0x01	; 1
      d3a:	18 f4       	brcc	.+6      	; 0xd42 <manual_control+0x60>
+	{
+		l293d_hb2_rotate_left();
      d3c:	0e 94 b5 06 	call	0xd6a	; 0xd6a <l293d_hb2_rotate_left>
      d40:	02 c0       	rjmp	.+4      	; 0xd46 <manual_control+0x64>
+	}
+	else
+	{
+		l293d_hb2_stop();
      d42:	0e 94 c9 06 	call	0xd92	; 0xd92 <l293d_hb2_stop>
      d46:	8f e4       	ldi	r24, 0x4F	; 79
      d48:	93 ec       	ldi	r25, 0xC3	; 195
@@ -1621,6 +1963,10 @@ unsigned int get_converter_voltage(void)
      d4c:	f1 f7       	brne	.-4      	; 0xd4a <manual_control+0x68>
      d4e:	00 c0       	rjmp	.+0      	; 0xd50 <manual_control+0x6e>
      d50:	00 00       	nop
+	}
+	
+	_delay_ms(25);
+}
      d52:	df 91       	pop	r29
      d54:	cf 91       	pop	r28
      d56:	1f 91       	pop	r17
@@ -2319,28 +2665,54 @@ void monitor(void)
     139a:	08 95       	ret
 
 0000139c <init_next_state_button>:
+}
+
+
+void init_next_state_button(void)
+{
+	BUTTON_1_DRR &= ~(1 << BUTTON_1_PIN); // PD2 is input
     139c:	8a 98       	cbi	0x11, 2	; 17
+
+	BUTTON_1_PORT |= (1 << BUTTON_1_PIN);    // turn on the pull-up resistor
     139e:	92 9a       	sbi	0x12, 2	; 18
+	// PD2 is now an input with pull-up enabled
+
+	MCUCR &= ~(1 << ISC00 | 1 << ISC01);    // low level of INT0 generates an interrupt request: when BUTTON_1 is pressed
     13a0:	85 b7       	in	r24, 0x35	; 53
     13a2:	8c 7f       	andi	r24, 0xFC	; 252
     13a4:	85 bf       	out	0x35, r24	; 53
+	GICR |= (1 << INT0);     // turns on INT0
     13a6:	8b b7       	in	r24, 0x3b	; 59
     13a8:	80 64       	ori	r24, 0x40	; 64
     13aa:	8b bf       	out	0x3b, r24	; 59
     13ac:	08 95       	ret
 
 000013ae <init_user_interface>:
+
+
+
+void init_user_interface(void)
+{
+	init_next_state_button();
     13ae:	0e 94 ce 09 	call	0x139c	; 0x139c <init_next_state_button>
     13b2:	08 95       	ret
 
 000013b4 <__vector_1>:
+	MCUCR &= ~(1 << ISC00 | 1 << ISC01);    // low level of INT0 generates an interrupt request: when BUTTON_1 is pressed
+	GICR |= (1 << INT0);     // turns on INT0
+}
+
+ISR (INT0_vect)
+{
     13b4:	1f 92       	push	r1
     13b6:	0f 92       	push	r0
     13b8:	0f b6       	in	r0, 0x3f	; 63
     13ba:	0f 92       	push	r0
     13bc:	11 24       	eor	r1, r1
     13be:	8f 93       	push	r24
+	cli(); // temporarily disable interrupts
     13c0:	f8 94       	cli
+	switch(STATE)
     13c2:	80 91 fe 06 	lds	r24, 0x06FE	; 0x8006fe <STATE>
     13c6:	82 30       	cpi	r24, 0x02	; 2
     13c8:	69 f0       	breq	.+26     	; 0x13e4 <__vector_1+0x30>
@@ -2353,20 +2725,47 @@ void monitor(void)
     13d6:	84 30       	cpi	r24, 0x04	; 4
     13d8:	69 f0       	breq	.+26     	; 0x13f4 <__vector_1+0x40>
     13da:	10 c0       	rjmp	.+32     	; 0x13fc <__vector_1+0x48>
+	{
+		case STATE_IDLE:
+		{
+			STATE = STATE_MANUAL;
     13dc:	82 e0       	ldi	r24, 0x02	; 2
     13de:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
+			break;
     13e2:	0f c0       	rjmp	.+30     	; 0x1402 <__vector_1+0x4e>
+		}
+		case STATE_MANUAL:
+		{
+			STATE = STATE_TRACKING;
     13e4:	83 e0       	ldi	r24, 0x03	; 3
     13e6:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
+			break;
     13ea:	0b c0       	rjmp	.+22     	; 0x1402 <__vector_1+0x4e>
+		}
+		case STATE_TRACKING:
+		{
+			STATE = STATE_MONITORING;
     13ec:	84 e0       	ldi	r24, 0x04	; 4
     13ee:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
+			break;
     13f2:	07 c0       	rjmp	.+14     	; 0x1402 <__vector_1+0x4e>
+		}
+		case STATE_MONITORING:
+		{
+			STATE = STATE_IDLE;
     13f4:	81 e0       	ldi	r24, 0x01	; 1
     13f6:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
+			break;
     13fa:	03 c0       	rjmp	.+6      	; 0x1402 <__vector_1+0x4e>
+		}
+		default:
+		{
+			STATE = STATE_IDLE;
     13fc:	81 e0       	ldi	r24, 0x01	; 1
     13fe:	80 93 fe 06 	sts	0x06FE, r24	; 0x8006fe <STATE>
+			break;
+		}
+	}
     1402:	8f 91       	pop	r24
     1404:	0f 90       	pop	r0
     1406:	0f be       	out	0x3f, r0	; 63

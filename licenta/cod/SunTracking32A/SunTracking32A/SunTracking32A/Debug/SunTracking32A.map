@@ -970,16 +970,16 @@ END GROUP
 .debug_str      0x00000000      0xa21
  *(.debug_str)
  .debug_str     0x00000000      0x196 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.150/gcc/dev/atmega32a/avr5/crtatmega32a.o
- .debug_str     0x00000196      0x17d adc_driver.o
-                                0x1b1 (size before relaxing)
- .debug_str     0x00000313       0xdc charge_driver.o
+ .debug_str     0x00000196      0x17e adc_driver.o
+                                0x1b2 (size before relaxing)
+ .debug_str     0x00000314       0x76 charge_driver.o
                                 0x214 (size before relaxing)
- .debug_str     0x000003ef      0x149 graphics.o
+ .debug_str     0x0000038a      0x1ae graphics.o
                                 0x2dc (size before relaxing)
  .debug_str     0x00000538       0xeb hx1230.o
-                                0x2fa (size before relaxing)
+                                0x2fb (size before relaxing)
  .debug_str     0x00000623       0xc7 joystick_driver.o
-                                0x2dc (size before relaxing)
+                                0x2dd (size before relaxing)
  .debug_str     0x000006ea       0x20 l293d.o
                                 0x250 (size before relaxing)
  .debug_str     0x0000070a       0x72 light.o
@@ -997,7 +997,7 @@ END GROUP
  .debug_str     0x000009c5       0x24 unipolar_driver.o
                                 0x279 (size before relaxing)
  .debug_str     0x000009e9       0x38 user_interface.o
-                                0x1f5 (size before relaxing)
+                                0x1f6 (size before relaxing)
 
 .debug_loc      0x00000000     0x11cc
  *(.debug_loc)
