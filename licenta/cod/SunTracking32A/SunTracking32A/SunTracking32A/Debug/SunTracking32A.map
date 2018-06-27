@@ -59,6 +59,12 @@ Discarded input sections
  .text          0x00000000        0x0 charge_driver.o
  .data          0x00000000        0x0 charge_driver.o
  .bss           0x00000000        0x0 charge_driver.o
+ .text.init_charge_control
+                0x00000000        0x6 charge_driver.o
+ .text.turn_on_charging
+                0x00000000        0x4 charge_driver.o
+ .text.turn_off_charging
+                0x00000000        0x4 charge_driver.o
  .text          0x00000000        0x0 graphics.o
  .data          0x00000000        0x0 graphics.o
  .bss           0x00000000        0x0 graphics.o
@@ -856,142 +862,142 @@ END GROUP
 .debug_sfnames
  *(.debug_sfnames)
 
-.debug_aranges  0x00000000      0x2e8
+.debug_aranges  0x00000000      0x300
  *(.debug_aranges)
  .debug_aranges
                 0x00000000       0x28 adc_driver.o
  .debug_aranges
-                0x00000028       0x28 charge_driver.o
+                0x00000028       0x40 charge_driver.o
  .debug_aranges
-                0x00000050       0x58 graphics.o
+                0x00000068       0x58 graphics.o
  .debug_aranges
-                0x000000a8       0x58 hx1230.o
+                0x000000c0       0x58 hx1230.o
  .debug_aranges
-                0x00000100       0x28 joystick_driver.o
+                0x00000118       0x28 joystick_driver.o
  .debug_aranges
-                0x00000128       0x38 l293d.o
+                0x00000140       0x38 l293d.o
  .debug_aranges
-                0x00000160       0x30 light.o
+                0x00000178       0x30 light.o
  .debug_aranges
-                0x00000190       0x28 main.o
+                0x000001a8       0x28 main.o
  .debug_aranges
-                0x000001b8       0x20 monitoring.o
+                0x000001d0       0x20 monitoring.o
  .debug_aranges
-                0x000001d8       0x48 stand_control.o
+                0x000001f0       0x48 stand_control.o
  .debug_aranges
-                0x00000220       0x40 state_handler.o
+                0x00000238       0x40 state_handler.o
  .debug_aranges
-                0x00000260       0x20 tracking.o
+                0x00000278       0x20 tracking.o
  .debug_aranges
-                0x00000280       0x38 unipolar_driver.o
+                0x00000298       0x38 unipolar_driver.o
  .debug_aranges
-                0x000002b8       0x30 user_interface.o
+                0x000002d0       0x30 user_interface.o
 
 .debug_pubnames
  *(.debug_pubnames)
 
-.debug_info     0x00000000     0x4547
+.debug_info     0x00000000     0x4594
  *(.debug_info .gnu.linkonce.wi.*)
  .debug_info    0x00000000      0x4e6 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.150/gcc/dev/atmega32a/avr5/crtatmega32a.o
  .debug_info    0x000004e6       0xb7 adc_driver.o
- .debug_info    0x0000059d       0xe9 charge_driver.o
- .debug_info    0x00000686      0xe89 graphics.o
- .debug_info    0x0000150f      0x524 hx1230.o
- .debug_info    0x00001a33      0x276 joystick_driver.o
- .debug_info    0x00001ca9      0x1ba l293d.o
- .debug_info    0x00001e63      0x1eb light.o
- .debug_info    0x0000204e      0xaa8 main.o
- .debug_info    0x00002af6      0x1a3 monitoring.o
- .debug_info    0x00002c99      0x1be stand_control.o
- .debug_info    0x00002e57      0x9dd state_handler.o
- .debug_info    0x00003834      0xa48 tracking.o
- .debug_info    0x0000427c      0x1d8 unipolar_driver.o
- .debug_info    0x00004454       0xf3 user_interface.o
+ .debug_info    0x0000059d      0x136 charge_driver.o
+ .debug_info    0x000006d3      0xe89 graphics.o
+ .debug_info    0x0000155c      0x524 hx1230.o
+ .debug_info    0x00001a80      0x276 joystick_driver.o
+ .debug_info    0x00001cf6      0x1ba l293d.o
+ .debug_info    0x00001eb0      0x1eb light.o
+ .debug_info    0x0000209b      0xaa8 main.o
+ .debug_info    0x00002b43      0x1a3 monitoring.o
+ .debug_info    0x00002ce6      0x1be stand_control.o
+ .debug_info    0x00002ea4      0x9dd state_handler.o
+ .debug_info    0x00003881      0xa48 tracking.o
+ .debug_info    0x000042c9      0x1d8 unipolar_driver.o
+ .debug_info    0x000044a1       0xf3 user_interface.o
 
-.debug_abbrev   0x00000000     0x127c
+.debug_abbrev   0x00000000     0x12a1
  *(.debug_abbrev)
  .debug_abbrev  0x00000000      0x4a3 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.150/gcc/dev/atmega32a/avr5/crtatmega32a.o
  .debug_abbrev  0x000004a3       0x7a adc_driver.o
- .debug_abbrev  0x0000051d       0x80 charge_driver.o
- .debug_abbrev  0x0000059d      0x105 graphics.o
- .debug_abbrev  0x000006a2      0x191 hx1230.o
- .debug_abbrev  0x00000833      0x14b joystick_driver.o
- .debug_abbrev  0x0000097e       0xe2 l293d.o
- .debug_abbrev  0x00000a60      0x157 light.o
- .debug_abbrev  0x00000bb7      0x13f main.o
- .debug_abbrev  0x00000cf6      0x10f monitoring.o
- .debug_abbrev  0x00000e05       0x74 stand_control.o
- .debug_abbrev  0x00000e79      0x13a state_handler.o
- .debug_abbrev  0x00000fb3      0x139 tracking.o
- .debug_abbrev  0x000010ec       0xf1 unipolar_driver.o
- .debug_abbrev  0x000011dd       0x9f user_interface.o
+ .debug_abbrev  0x0000051d       0xa5 charge_driver.o
+ .debug_abbrev  0x000005c2      0x105 graphics.o
+ .debug_abbrev  0x000006c7      0x191 hx1230.o
+ .debug_abbrev  0x00000858      0x14b joystick_driver.o
+ .debug_abbrev  0x000009a3       0xe2 l293d.o
+ .debug_abbrev  0x00000a85      0x157 light.o
+ .debug_abbrev  0x00000bdc      0x13f main.o
+ .debug_abbrev  0x00000d1b      0x10f monitoring.o
+ .debug_abbrev  0x00000e2a       0x74 stand_control.o
+ .debug_abbrev  0x00000e9e      0x13a state_handler.o
+ .debug_abbrev  0x00000fd8      0x139 tracking.o
+ .debug_abbrev  0x00001111       0xf1 unipolar_driver.o
+ .debug_abbrev  0x00001202       0x9f user_interface.o
 
-.debug_line     0x00000000     0x1bdf
+.debug_line     0x00000000     0x1c89
  *(.debug_line .debug_line.* .debug_line_end)
  .debug_line    0x00000000      0x115 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.150/gcc/dev/atmega32a/avr5/crtatmega32a.o
  .debug_line    0x00000115       0xe5 adc_driver.o
- .debug_line    0x000001fa       0x86 charge_driver.o
- .debug_line    0x00000280      0x351 graphics.o
- .debug_line    0x000005d1      0x382 hx1230.o
- .debug_line    0x00000953      0x1e4 joystick_driver.o
- .debug_line    0x00000b37      0x198 l293d.o
- .debug_line    0x00000ccf      0x121 light.o
- .debug_line    0x00000df0      0x2e6 main.o
- .debug_line    0x000010d6      0x158 monitoring.o
- .debug_line    0x0000122e       0xe2 stand_control.o
- .debug_line    0x00001310      0x28a state_handler.o
- .debug_line    0x0000159a      0x256 tracking.o
- .debug_line    0x000017f0      0x2b8 unipolar_driver.o
- .debug_line    0x00001aa8      0x137 user_interface.o
+ .debug_line    0x000001fa      0x130 charge_driver.o
+ .debug_line    0x0000032a      0x351 graphics.o
+ .debug_line    0x0000067b      0x382 hx1230.o
+ .debug_line    0x000009fd      0x1e4 joystick_driver.o
+ .debug_line    0x00000be1      0x198 l293d.o
+ .debug_line    0x00000d79      0x121 light.o
+ .debug_line    0x00000e9a      0x2e6 main.o
+ .debug_line    0x00001180      0x158 monitoring.o
+ .debug_line    0x000012d8       0xe2 stand_control.o
+ .debug_line    0x000013ba      0x28a state_handler.o
+ .debug_line    0x00001644      0x256 tracking.o
+ .debug_line    0x0000189a      0x2b8 unipolar_driver.o
+ .debug_line    0x00001b52      0x137 user_interface.o
 
-.debug_frame    0x00000000      0x534
+.debug_frame    0x00000000      0x564
  *(.debug_frame)
  .debug_frame   0x00000000       0x34 adc_driver.o
- .debug_frame   0x00000034       0x34 charge_driver.o
- .debug_frame   0x00000068       0xe0 graphics.o
- .debug_frame   0x00000148       0xdc hx1230.o
- .debug_frame   0x00000224       0x48 joystick_driver.o
- .debug_frame   0x0000026c       0x54 l293d.o
- .debug_frame   0x000002c0       0x58 light.o
- .debug_frame   0x00000318       0x34 main.o
- .debug_frame   0x0000034c       0x30 monitoring.o
- .debug_frame   0x0000037c       0x74 stand_control.o
- .debug_frame   0x000003f0       0x6c state_handler.o
- .debug_frame   0x0000045c       0x30 tracking.o
- .debug_frame   0x0000048c       0x54 unipolar_driver.o
- .debug_frame   0x000004e0       0x54 user_interface.o
+ .debug_frame   0x00000034       0x64 charge_driver.o
+ .debug_frame   0x00000098       0xe0 graphics.o
+ .debug_frame   0x00000178       0xdc hx1230.o
+ .debug_frame   0x00000254       0x48 joystick_driver.o
+ .debug_frame   0x0000029c       0x54 l293d.o
+ .debug_frame   0x000002f0       0x58 light.o
+ .debug_frame   0x00000348       0x34 main.o
+ .debug_frame   0x0000037c       0x30 monitoring.o
+ .debug_frame   0x000003ac       0x74 stand_control.o
+ .debug_frame   0x00000420       0x6c state_handler.o
+ .debug_frame   0x0000048c       0x30 tracking.o
+ .debug_frame   0x000004bc       0x54 unipolar_driver.o
+ .debug_frame   0x00000510       0x54 user_interface.o
 
-.debug_str      0x00000000      0x984
+.debug_str      0x00000000      0xa21
  *(.debug_str)
  .debug_str     0x00000000      0x196 C:/Program Files (x86)/Atmel/Studio/7.0/Packs/atmel/ATmega_DFP/1.2.150/gcc/dev/atmega32a/avr5/crtatmega32a.o
- .debug_str     0x00000196      0x17d adc_driver.o
-                                0x1b1 (size before relaxing)
- .debug_str     0x00000313       0x3f charge_driver.o
-                                0x1d4 (size before relaxing)
- .debug_str     0x00000352      0x149 graphics.o
+ .debug_str     0x00000196      0x17e adc_driver.o
+                                0x1b2 (size before relaxing)
+ .debug_str     0x00000314       0x76 charge_driver.o
+                                0x214 (size before relaxing)
+ .debug_str     0x0000038a      0x1ae graphics.o
                                 0x2dc (size before relaxing)
- .debug_str     0x0000049b       0xeb hx1230.o
-                                0x2fa (size before relaxing)
- .debug_str     0x00000586       0xc7 joystick_driver.o
-                                0x2dc (size before relaxing)
- .debug_str     0x0000064d       0x20 l293d.o
+ .debug_str     0x00000538       0xeb hx1230.o
+                                0x2fb (size before relaxing)
+ .debug_str     0x00000623       0xc7 joystick_driver.o
+                                0x2dd (size before relaxing)
+ .debug_str     0x000006ea       0x20 l293d.o
                                 0x250 (size before relaxing)
- .debug_str     0x0000066d       0x72 light.o
+ .debug_str     0x0000070a       0x72 light.o
                                 0x21d (size before relaxing)
- .debug_str     0x000006df       0x5d main.o
+ .debug_str     0x0000077c       0x5d main.o
                                 0x2f5 (size before relaxing)
- .debug_str     0x0000073c       0x12 monitoring.o
-                                0x26a (size before relaxing)
- .debug_str     0x0000074e       0x85 stand_control.o
+ .debug_str     0x000007d9       0x12 monitoring.o
+                                0x26b (size before relaxing)
+ .debug_str     0x000007eb       0x85 stand_control.o
                                 0x2ad (size before relaxing)
- .debug_str     0x000007d3       0x65 state_handler.o
+ .debug_str     0x00000870       0x65 state_handler.o
                                 0x323 (size before relaxing)
- .debug_str     0x00000838       0xf0 tracking.o
+ .debug_str     0x000008d5       0xf0 tracking.o
                                 0x3cf (size before relaxing)
- .debug_str     0x00000928       0x24 unipolar_driver.o
+ .debug_str     0x000009c5       0x24 unipolar_driver.o
                                 0x279 (size before relaxing)
- .debug_str     0x0000094c       0x38 user_interface.o
-                                0x1f5 (size before relaxing)
+ .debug_str     0x000009e9       0x38 user_interface.o
+                                0x1f6 (size before relaxing)
 
 .debug_loc      0x00000000     0x11cc
  *(.debug_loc)
@@ -1027,22 +1033,22 @@ END GROUP
 .debug_pubtypes
  *(.debug_pubtypes)
 
-.debug_ranges   0x00000000      0x208
+.debug_ranges   0x00000000      0x220
  *(.debug_ranges)
  .debug_ranges  0x00000000       0x18 adc_driver.o
- .debug_ranges  0x00000018       0x18 charge_driver.o
- .debug_ranges  0x00000030       0x48 graphics.o
- .debug_ranges  0x00000078       0x48 hx1230.o
- .debug_ranges  0x000000c0       0x18 joystick_driver.o
- .debug_ranges  0x000000d8       0x28 l293d.o
- .debug_ranges  0x00000100       0x20 light.o
- .debug_ranges  0x00000120       0x18 main.o
- .debug_ranges  0x00000138       0x10 monitoring.o
- .debug_ranges  0x00000148       0x38 stand_control.o
- .debug_ranges  0x00000180       0x30 state_handler.o
- .debug_ranges  0x000001b0       0x10 tracking.o
- .debug_ranges  0x000001c0       0x28 unipolar_driver.o
- .debug_ranges  0x000001e8       0x20 user_interface.o
+ .debug_ranges  0x00000018       0x30 charge_driver.o
+ .debug_ranges  0x00000048       0x48 graphics.o
+ .debug_ranges  0x00000090       0x48 hx1230.o
+ .debug_ranges  0x000000d8       0x18 joystick_driver.o
+ .debug_ranges  0x000000f0       0x28 l293d.o
+ .debug_ranges  0x00000118       0x20 light.o
+ .debug_ranges  0x00000138       0x18 main.o
+ .debug_ranges  0x00000150       0x10 monitoring.o
+ .debug_ranges  0x00000160       0x38 stand_control.o
+ .debug_ranges  0x00000198       0x30 state_handler.o
+ .debug_ranges  0x000001c8       0x10 tracking.o
+ .debug_ranges  0x000001d8       0x28 unipolar_driver.o
+ .debug_ranges  0x00000200       0x20 user_interface.o
 
 .debug_macro
  *(.debug_macro)
